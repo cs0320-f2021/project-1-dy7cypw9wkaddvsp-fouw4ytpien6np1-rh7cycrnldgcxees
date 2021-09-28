@@ -1,9 +1,7 @@
 package edu.brown.cs.student.main;
+import java.lang.reflect.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Database {
 
@@ -34,9 +32,9 @@ public class Database {
      * A method to insert generic object into Databas
      * @param object - Object to be inserted into Database
      */
-    public void insert(Object object) throws RuntimeException {
-        String tableName = object.getSimpleName(); // use reflection api to get class name
-        Field[] rawFields = object.getDeclaredFields();
+    public void insert(Object object) throws RuntimeException, SQLException, IllegalAccessException {
+        String tableName = object.getClass().getSimpleName(); // use reflection api to get class name
+        Field[] rawFields = object.getClass().getDeclaredFields();
         //String[] fieldNames = new String[](rawFields.length);
         //Object[] fieldContent = new Object[](rawFields.length);
         String tuple = "";
@@ -45,15 +43,15 @@ public class Database {
 
             //fieldNames[i] = rawFields[i].getName();  // name of field as string
             //fieldContent[i] = rawFields[i].get();  // object (content) of field
-            Object currentContent = rawFields[i].get();
+            Object currentContent = rawFields[i].get(object);
 
 
             // THIS vvv SEEMS WRONG BUT WE CAN FIX IT LATER
-            if (rawFields[i].getGenericType() == int || rawFields[i].getGenericType() == double) {
-                tuple += rawFields[i].get().toString;
+            if (rawFields[i].getGenericType().getTypeName().equals("int") || rawFields[i].getGenericType().getTypeName().equals("double")) {
+                tuple += rawFields[i].get(object).toString();
             }
-            else if (rawFields[i].getGenericType() == String) {
-                tuple += "\'" + rawFields[i].get().toString + "\'";
+            else if (rawFields[i].getGenericType().getTypeName().equals("String")) {
+                tuple += "'" + rawFields[i].get(object).toString() + "'";
             }
             else {
                 throw new RuntimeException("Invalid Field Type");
@@ -74,29 +72,31 @@ public class Database {
      * Deletes given object from Database
      * @param object - object to be deleted from Database
      */
-    public void delete(Object object) {
-        String tableName = object.getSimpleName();
-        Field[] rawFields = object.getDeclaredFields();
+    public void delete(Object object) throws SQLException, IllegalAccessException {
+        String tableName = object.getClass().getSimpleName();
+        Field[] rawFields = object.getClass().getDeclaredFields();
         //String[] fieldNames = new String[](rawFields.length);
-        Object[] fieldContent = new Object[](rawFields.length);
+
+        Object[] fieldContent = new Object[rawFields.length];
         String tuple = "";
+        String conditions = "";
         for (int i = 0; i<rawFields.length; i++) {
             rawFields[i].setAccessible(true);
             //fieldNames[i] = rawFields[i].getName();
             //fieldContent[i] = rawFields[i].get();  // object (content) of field
 
 
-            Object currentContent = rawFields[i].get();
+            Object currentContent = rawFields[i].get(object);
             String attrName = rawFields[i].getName();
 
 
             conditions += attrName + "=";
             // THIS vvv SEEMS WRONG BUT WE CAN FIX IT LATER
-            if (rawFields[i].getGenericType() == int || rawFields[i].getGenericType() == double) {
-                conditions += currentContent.toString;
+            if (rawFields[i].getGenericType().getTypeName().equals("int") || rawFields[i].getGenericType().getTypeName().equals("double")) {
+                conditions += currentContent.toString();
             }
-            else if (rawFields[i].getGenericType() == String) {
-                conditions += "\'" + rawFields[i].get().toString + "\'";
+            else if (rawFields[i].getGenericType().getTypeName().equals("String")) {
+                conditions += "'" + rawFields[i].get(object).toString() + "'";
             }
             else {
                 throw new RuntimeException("Invalid Field Type");
@@ -111,8 +111,8 @@ public class Database {
         prep.close();
     }
 
-    public Collection where(String attributeName, String attributeContent) {
-
+    public Collection<Object> where(String attributeName, String attributeContent) {
+        return new ArrayList<Object>();
     }
 
     public void update() {
@@ -120,24 +120,6 @@ public class Database {
 
     public void rawQuery(String sqlStatement) {
     }
-
-
-
-
-//    Map<String, Integer> getInstanceMap() throws SQLException {
-//        Map<String, Integer> instMap = new HashMap<>();
-//        //TODO: select the five most common words from the entire database, and how many times they appear
-//        PreparedStatement prep = conn.prepareStatement(
-//                "SELECT word, COUNT(*) FROM word GROUP BY word.word ORDER BY COUNT(*) DESC LIMIT 5;"); //Your SQL Here!
-//        ResultSet rs = prep.executeQuery();
-//        while (rs.next()) {
-//            instMap.put(rs.getString(1), rs.getInt(2));
-//        }
-//
-//        prep.close();
-//        rs.close();
-//        return instMap;
-//    }
 
     /**
      * Retrieves all words that should be used.
