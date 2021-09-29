@@ -64,7 +64,7 @@ public final class Main {
     // TODO: Add your REPL here!
     try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
       String input;
-      StarSorter starSorter = new StarSorter();
+      Database bd;
 
       while ((input = br.readLine()) != null) {
         try {

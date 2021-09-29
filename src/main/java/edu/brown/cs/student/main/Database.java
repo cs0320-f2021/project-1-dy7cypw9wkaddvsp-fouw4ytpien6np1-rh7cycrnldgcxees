@@ -8,6 +8,7 @@ public class Database {
     private static Connection conn = null;
     private static List<String> words = new ArrayList<>();
 
+
     /**
      * Instantiates the database, creating tables if necessary.
      * Automatically loads files.
@@ -27,12 +28,25 @@ public class Database {
         stat.executeUpdate("PRAGMA foreign_keys=ON;");
         stat.close();
     }
+    
+    public void changePath(String filename) throws ClassNotFoundException, SQLException {
+        conn = null;
+        words = new ArrayList<>();
 
+        Class.forName("org.sqlite.JDBC");
+        String urlToDB = "jdbc:sqlite:" + filename;
+        Connection conn = DriverManager.getConnection(urlToDB);
+        Database.conn = conn;
+
+        Statement stat = conn.createStatement();
+        stat.executeUpdate("PRAGMA foreign_keys=ON;");
+        stat.close();
+    }
     /**
      * A method to insert generic object into Databas
      * @param object - Object to be inserted into Database
      */
-    public void insert(Object object) throws RuntimeException, SQLException, IllegalAccessException {
+    public static void insert(Object object) throws RuntimeException, SQLException, IllegalAccessException {
         String tableName = object.getClass().getSimpleName(); // use reflection api to get class name
         Field[] rawFields = object.getClass().getDeclaredFields();
         //String[] fieldNames = new String[](rawFields.length);
@@ -72,7 +86,7 @@ public class Database {
      * Deletes given object from Database
      * @param object - object to be deleted from Database
      */
-    public void delete(Object object) throws SQLException, IllegalAccessException {
+    public static void delete(Object object) throws SQLException, IllegalAccessException {
         String tableName = object.getClass().getSimpleName();
         Field[] rawFields = object.getClass().getDeclaredFields();
         //String[] fieldNames = new String[](rawFields.length);
@@ -111,7 +125,7 @@ public class Database {
         prep.close();
     }
 
-    public Collection<Object> where(String attributeName, String attributeContent) {
+    public static Collection<Object> where(String attributeName, String attributeContent) {
         return new ArrayList<Object>();
     }
 
