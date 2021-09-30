@@ -46,7 +46,7 @@ public class Database {
      * A method to insert generic object into Databas
      * @param object - Object to be inserted into Database
      */
-    public static void insert(Object object) throws RuntimeException, SQLException, IllegalAccessException {
+    public void insert(Object object) throws RuntimeException, SQLException, IllegalAccessException {
         String tableName = object.getClass().getSimpleName(); // use reflection api to get class name
         Field[] rawFields = object.getClass().getDeclaredFields();
         //String[] fieldNames = new String[](rawFields.length);
@@ -86,7 +86,7 @@ public class Database {
      * Deletes given object from Database
      * @param object - object to be deleted from Database
      */
-    public static void delete(Object object) throws SQLException, IllegalAccessException {
+    public void delete(Object object) throws SQLException, IllegalAccessException {
         String tableName = object.getClass().getSimpleName();
         Field[] rawFields = object.getClass().getDeclaredFields();
         //String[] fieldNames = new String[](rawFields.length);
@@ -119,20 +119,38 @@ public class Database {
                 conditions += " AND ";
             }
         }
-        String writtenStatement = "DELETE FROM Customers WHERE " + conditions + ";";
-        PreparedStatement prep= conn.prepareStatement(writtenStatement);
+        String writtenStatement = "DELETE FROM " + tableName + " WHERE " + conditions + ";";
+        PreparedStatement prep = conn.prepareStatement(writtenStatement);
         prep.executeUpdate();
         prep.close();
     }
 
-    public static Collection<Object> where(String attributeName, String attributeContent) {
+    public Collection<Object> where(String attributeName, String attributeContent)
+        throws SQLException {
+        String writtenStatement = "SELECT * FROM Customers WHERE " + attributeName + "=" +
+            attributeContent + ";";
+        PreparedStatement prep = conn.prepareStatement(writtenStatement);
+        prep.executeUpdate();
+        prep.close();
         return new ArrayList<Object>();
     }
 
-    public void update() {
+    public void update(Object object, String attributeName, String newAttributeContent)
+        throws SQLException {
+        String tableName = object.getClass().getSimpleName();
+        // need to set where condition to only update object in table with
+        // all of the attrs in that object
+        String writtenStatement = "UPDATE " + tableName + " SET " + attributeName + "=" +
+            newAttributeContent + ";";
+        PreparedStatement prep = conn.prepareStatement(writtenStatement);
+        prep.executeUpdate();
+        prep.close();
     }
 
-    public void rawQuery(String sqlStatement) {
+    public void rawQuery(String sqlStatement) throws SQLException {
+        PreparedStatement prep = conn.prepareStatement(sqlStatement);
+        prep.executeUpdate();
+        prep.close();
     }
 
     /**
