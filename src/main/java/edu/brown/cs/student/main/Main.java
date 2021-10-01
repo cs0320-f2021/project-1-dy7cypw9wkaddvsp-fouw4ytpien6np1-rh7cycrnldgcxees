@@ -11,6 +11,8 @@ import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 
+import edu.brown.cs.student.main.handlers.HandlerArguments;
+import edu.brown.cs.student.main.handlers.ICommandHandler;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -61,10 +63,15 @@ public final class Main {
       runSparkServer((int) options.valueOf("port"));
     }
 
+
+    CommandHashmap map = new CommandHashmap();
+    HashMap<String, ICommandHandler> keywordMap = map.getMap();
+
     // TODO: Add your REPL here!
     try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
       String input;
-      Database bd;
+      Database db = new Database();
+      KDTree kd = new KDTree();
 
       while ((input = br.readLine()) != null) {
         try {
@@ -73,7 +80,9 @@ public final class Main {
           for (String str : arguments) {
             str = str.trim();
           }
-          // REPL goes here
+
+          HandlerArguments handlerArgs = new HandlerArguments(kd, db, arguments);
+          keywordMap.get(arguments[0]).handle(handlerArgs);
         } catch (Exception e) {
           // e.printStackTrace();
           System.out.println("ERROR: We couldn't process your input\n"+e);
