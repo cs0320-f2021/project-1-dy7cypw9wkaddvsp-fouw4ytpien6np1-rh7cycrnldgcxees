@@ -28,7 +28,13 @@ public class Database {
         stat.executeUpdate("PRAGMA foreign_keys=ON;");
         stat.close();
     }
-    
+
+    /**
+     *
+     * @param filename
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public void changePath(String filename) throws ClassNotFoundException, SQLException {
         conn = null;
         words = new ArrayList<>();
@@ -125,16 +131,33 @@ public class Database {
         prep.close();
     }
 
+    /**
+     *
+     * @param attributeName
+     * @param attributeContent
+     * @return
+     * @throws SQLException
+     */
     public Collection<Object> where(String attributeName, String attributeContent)
         throws SQLException {
-        String writtenStatement = "SELECT * FROM Customers WHERE " + attributeName + "=" +
-            attributeContent + ";";
+        // use length() - 1 because of database.where("firstname=?", "Colton");
+        String writtenStatement = "SELECT * FROM Customers WHERE " +
+            attributeName.substring(0, attributeName.length() - 1) + attributeContent + ";";
         PreparedStatement prep = conn.prepareStatement(writtenStatement);
         prep.executeUpdate();
         prep.close();
+        // how do we get the SQL results as Objects? or do we just return void and prep will
+        // automatically display the Objects that match the where statement?
         return new ArrayList<Object>();
     }
 
+    /**
+     *
+     * @param object
+     * @param attributeName
+     * @param newAttributeContent
+     * @throws SQLException
+     */
     public void update(Object object, String attributeName, String newAttributeContent)
         throws SQLException {
         String tableName = object.getClass().getSimpleName();
@@ -147,6 +170,11 @@ public class Database {
         prep.close();
     }
 
+    /**
+     *
+     * @param sqlStatement
+     * @throws SQLException
+     */
     public void rawQuery(String sqlStatement) throws SQLException {
         PreparedStatement prep = conn.prepareStatement(sqlStatement);
         prep.executeUpdate();

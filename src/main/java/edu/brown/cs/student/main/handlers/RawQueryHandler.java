@@ -1,4 +1,4 @@
-package edu.brown.cs.student.main.handlers;
+package handlers;
 
 import edu.brown.cs.student.main.Database;
 
