@@ -1,0 +1,5 @@
+INPUT
+database data/project-1/justusersSMALL.json
+database data/project-1/justreviewsSMALL.json
+OUTPUT
+END
