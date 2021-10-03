@@ -1,14 +1,12 @@
 package edu.brown.cs.student.main;
 
-/**
- * Class for Nodes, which are nodes in the KDTree that have children.
- */
 public class Node extends AbsNode{
     private INode left;
     private INode right;
 
-    public Node(double height, double weight, double age, String attr, int depth) {
-        super(height, weight,age, attr, depth);
+
+    public Node(double height, double weight, double age, String attr) {
+        super(height, weight,age, attr);
     }
 
     @Override
