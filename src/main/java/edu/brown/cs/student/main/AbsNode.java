@@ -8,6 +8,7 @@ public abstract class AbsNode implements INode{
     private final double weight;
     private final double age;
     private final int level;
+    // should fields be protected instead of public so subclasses have access to them?
 
     /**
      * Indicates which attribute the item at this tier is splitting on
