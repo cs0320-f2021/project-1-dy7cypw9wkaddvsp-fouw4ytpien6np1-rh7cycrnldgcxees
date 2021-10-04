@@ -4,6 +4,7 @@ import edu.brown.cs.student.main.table.ITable;
 import edu.brown.cs.student.main.table.TableHashMap;
 import edu.brown.cs.student.main.table.Users;
 import org.checkerframework.checker.units.qual.A;
+import org.eclipse.jetty.server.Authentication;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -163,7 +164,7 @@ public class Database {
      * @return Collection<Object> - A collection of objects
      * @throws SQLException - throws error if bad input (i.e. col name doesn't exist)
      */
-    public Collection<Object> selectAll(List<String> attributes, String tableName)
+    public List<Object> selectAll(List<String> attributes, String tableName)
             throws SQLException {
         // get hashmap of table name to Objects that implement ITable
         TableHashMap map = new TableHashMap();
@@ -187,6 +188,29 @@ public class Database {
         while (rs.next()) { // create a new object of each result
             ITable table = tableMap.get(tableName.toLowerCase());
             objects.add(table.createObject(rs));
+        }
+        prep.close();
+        return objects;
+    }
+
+    /**
+     * Method to select all rows of specific columns from a table
+     * @return Collection<Object> - A collection of objects
+     * @throws SQLException - throws error if bad input (i.e. col name doesn't exist)
+     */
+    public List<Users> selectAllUsers()
+            throws SQLException {
+
+        ArrayList<Users> objects = new ArrayList<>(); // output collection
+
+        // put together SQL:
+        String writtenStatement = "SELECT height, weight, age, horoscope FROM users";
+        PreparedStatement prep = conn.prepareStatement(writtenStatement); // prep statement
+        prep.executeUpdate();
+        ResultSet rs = prep.executeQuery(); // returns a ResultSet of SQL query
+        while (rs.next()) { // create a new object of each result
+            Users u = new Users();
+            objects.add(u.createUserObject(rs));
         }
         prep.close();
         return objects;

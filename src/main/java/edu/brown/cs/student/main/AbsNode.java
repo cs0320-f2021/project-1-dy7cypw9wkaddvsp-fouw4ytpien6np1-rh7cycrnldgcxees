@@ -19,7 +19,7 @@ public abstract class AbsNode implements INode{
         this.weight=weight;
         this.age = age;
         this.level = level;
-        if (!type.equals("h") && !type.equals("w") && !type.equals("a")) {
+        if (!type.equals("height") && !type.equals("weight") && !type.equals("age")) {
             throw new RuntimeException("invalid attribute tag");
         }
         else {

@@ -1,12 +1,5 @@
 package handlers;
 
-import handlers.CommandHandler;
-import handlers.InsertHandler;
-import handlers.DeleteHandler;
-import handlers.DatabaseHandler;
-import handlers.RawQueryHandler;
-import handlers.SelectHandler;
-import handlers.UpdateHandler;
 import java.util.HashMap;
 import java.util.Map;
 

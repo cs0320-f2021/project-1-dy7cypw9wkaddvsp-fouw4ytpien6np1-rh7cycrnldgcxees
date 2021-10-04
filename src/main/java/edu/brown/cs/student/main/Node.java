@@ -7,8 +7,10 @@ public class Node extends AbsNode{
     private INode left;
     private INode right;
 
-    public Node(double height, double weight, double age, String attr, int depth) {
+    public Node(double height, double weight, double age, String attr, int depth, INode left, INode right) {
         super(height, weight,age, attr, depth);
+        this.left = left;
+        this.right = right;
     }
 
     @Override

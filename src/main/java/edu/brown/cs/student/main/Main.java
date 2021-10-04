@@ -71,7 +71,7 @@ public final class Main {
     try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
       String input;
       Database db = new Database();
-      KDTree kd = new KDTree();
+      UsersKDTree kd = new UsersKDTree();
 
       while ((input = br.readLine()) != null) {
         try {
