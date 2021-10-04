@@ -21,7 +21,7 @@ public class UsersKDTree implements IKDTree {
      */
     public UsersKDTree() {
         depthMap = new HashMap<>();
-        depthMap.put(0, "height");
+        depthMap.put(0, "height"); // levels % 3
         depthMap.put(1, "weight");
         depthMap.put(2, "age");
     }
