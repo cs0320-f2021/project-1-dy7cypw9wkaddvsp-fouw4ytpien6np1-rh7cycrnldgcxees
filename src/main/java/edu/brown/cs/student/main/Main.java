@@ -1,4 +1,4 @@
-
+package edu.brown.cs.student.main;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,15 +11,9 @@ import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 
+import edu.brown.cs.student.main.handlers.HandlerArguments;
+import edu.brown.cs.student.main.handlers.ICommandHandler;
 import freemarker.template.Configuration;
-import handlers.CommandHandler;
-import handlers.CommandHashMap;
-import handlers.DatabaseHandler;
-import handlers.DeleteHandler;
-import handlers.InsertHandler;
-import handlers.RawQueryHandler;
-import handlers.SelectHandler;
-import handlers.UpdateHandler;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import spark.ExceptionHandler;
@@ -29,7 +23,6 @@ import spark.Response;
 import spark.Spark;
 import spark.TemplateViewRoute;
 import spark.template.freemarker.FreeMarkerEngine;
-import edu.brown.cs.student.main.Database;
 
 /**
  * The Main class of our project. This is where execution begins.
@@ -70,21 +63,15 @@ public final class Main {
       runSparkServer((int) options.valueOf("port"));
     }
 
+
+    CommandHashmap map = new CommandHashmap();
+    HashMap<String, ICommandHandler> keywordMap = map.getMap();
+
     // TODO: Add your REPL here!
     try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
       String input;
-      Database db = null; // initialize to null, but instantiated when calling the database command
-
-      // HashMap of Commands created here, otherwise to create a class that returns
-      // a HashMap, we may need to have it implement the "MAP" interface, which
-      // would require implementing all of the methods of that interface
-      Map<String, CommandHandler<?>> commandHashMap = new HashMap<>();
-      commandHashMap.put("insert", new InsertHandler());
-      commandHashMap.put("delete", new DeleteHandler());
-      commandHashMap.put("database", new DatabaseHandler());
-      commandHashMap.put("query", new RawQueryHandler());
-      commandHashMap.put("where", new SelectHandler());
-      commandHashMap.put("update", new UpdateHandler());
+      Database db = new Database();
+      KDTree kd = new KDTree();
 
       while ((input = br.readLine()) != null) {
         try {
@@ -93,12 +80,12 @@ public final class Main {
           for (String str : arguments) {
             str = str.trim();
           }
-          CommandHandler<?> handler = commandHashMap.get(arguments[0]);
-          handler.handle(db, arguments);
-          // REPL goes here
+
+          HandlerArguments handlerArgs = new HandlerArguments(kd, db, arguments);
+          keywordMap.get(arguments[0]).handle(handlerArgs);
         } catch (Exception e) {
           // e.printStackTrace();
-          System.out.println("ERROR: We couldn't process your input\n"+e.getMessage());
+          System.out.println("ERROR: We couldn't process your input\n"+e);
           e.printStackTrace();
         }
       }
@@ -108,8 +95,6 @@ public final class Main {
     }
 
   }
-
-
 
   private static FreeMarkerEngine createEngine() {
     Configuration config = new Configuration(Configuration.VERSION_2_3_0);

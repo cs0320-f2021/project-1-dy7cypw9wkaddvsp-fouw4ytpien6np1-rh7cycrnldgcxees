@@ -1,0 +1,6 @@
+INPUT
+database data/project-1/justusersSMALL.json
+database data/project-1/justreviewsSMALL.json
+database data/project-1/runwaySMALL.sqlite3
+OUTPUT
+END

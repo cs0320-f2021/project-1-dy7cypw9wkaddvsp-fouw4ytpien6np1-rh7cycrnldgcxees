@@ -1,0 +1,4 @@
+INPUT
+database data/project-1/justusersSMALL.json
+OUTPUT
+END
