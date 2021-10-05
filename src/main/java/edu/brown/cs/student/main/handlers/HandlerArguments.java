@@ -1,7 +1,7 @@
 package edu.brown.cs.student.main.handlers;
 
 import edu.brown.cs.student.main.Database;
-import edu.brown.cs.student.main.KDTree;
+import edu.brown.cs.student.main.UsersKDTree;
 
 /**
  * Class to hold references to KDTree and Database, as well as REPL arguments
@@ -9,7 +9,7 @@ import edu.brown.cs.student.main.KDTree;
  */
 public class HandlerArguments {
 
-    private final KDTree kdTree;
+    private final UsersKDTree kdTree;
     private final Database db;
     private final String[] args;
 
@@ -19,7 +19,7 @@ public class HandlerArguments {
      * @param db - Database from Main
      * @param args - String[] of REPL arguments from user
      */
-    public HandlerArguments(KDTree kd, Database db, String[] args) {
+    public HandlerArguments(UsersKDTree kd, Database db, String[] args) {
         this.kdTree = kd;
         this.db = db;
         this.args = args;
@@ -29,7 +29,7 @@ public class HandlerArguments {
      * Gets KDTree
      * @return the KDTree reference
      */
-    public KDTree getKdTree() {
+    public UsersKDTree getKdTree() {
         return kdTree;
     }
 
