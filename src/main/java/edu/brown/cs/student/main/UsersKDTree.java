@@ -33,7 +33,7 @@ public class UsersKDTree implements IKDTree {
      */
     public void fillTree(Database db) throws SQLException {
         List<Users> allUsers = db.selectAllUsers();
-        root = treeRecur(allUsers, 0);
+        root = treeRecur(allUsers, 0, null);
     }
 
     /**
@@ -61,7 +61,7 @@ public class UsersKDTree implements IKDTree {
      * @param depth - current depth - starts at 0
      * @return - current Node/root
      */
-    private INode treeRecur(List<Users> userList, int depth) {
+    private INode treeRecur(List<Users> userList, int depth, INode parent) {
         if(userList.size() > 1) {
             //sort list based on attribute
             List <Users> sortedList = sortUsers(userList, depth);
@@ -70,27 +70,30 @@ public class UsersKDTree implements IKDTree {
             int pivot = sortedList.size()/2;
             Users median = sortedList.get(pivot);
 
+            Node medianNode = new Node(
+                    median.getHeight(), median.getWeight(), median.getAge(),
+                    depthMap.get(depth % 3), depth, median, parent);
             INode left;
             INode right;
             if (userList.size() > 2) {
-                left = treeRecur(sortedList.subList(0,pivot), depth+1);
-                right = treeRecur(sortedList.subList(pivot+1, sortedList.size()), depth+1);
+                left = treeRecur(sortedList.subList(0,pivot), depth+1, medianNode);
+                right = treeRecur(sortedList.subList(pivot+1, sortedList.size()), depth+1, medianNode);
             }
             else {
-                left = treeRecur(sortedList.subList(0,pivot), depth+1);
+                left = treeRecur(sortedList.subList(0,pivot), depth+1, medianNode);
                 right = null;
             }
 
-            return new Node(
-                    median.getHeight(), median.getWeight(), median.getAge(),
-                    depthMap.get(depth % 3), depth, left, right);
+            medianNode.setLeft(left);
+            medianNode.setRight(right);
+            return medianNode;
         }
         else if (userList.size() == 1){
             Users current = userList.get(0);
 
             return new Leaf(
                     current.getHeight(), current.getWeight(), current.getAge(),
-                    depthMap.get(depth % 3), depth);
+                    depthMap.get(depth % 3), depth, current, parent);
         }
         else {
             throw new RuntimeException("User List is Empty");
@@ -103,6 +106,46 @@ public class UsersKDTree implements IKDTree {
      */
     public INode getRoot() {
         return root;
+    }
+
+    /*
+    Given: a node and a target point to search around...
+Get the straight-line (Euclidean) distance from your target point to the current node.
+If the current node is closer to your target point than one of your k-nearest neighbors,
+or if your collection of neighbors is not full, update the list accordingly
+
+Find the relevant axis (x, y, z) according to the depth.
+
+If the Euclidean distance between the target point and the farthest of the current
+“best neighbors” you have so far is greater than the relevant axis distance*
+between the current node and target point, recur on both children.
+*The axis distance is the straight line distance from your target point to the plane,
+so the difference between the two points on the relevant axis
+(target’s i’th coordinate - current node’s i’th coordinate)
+Searching the other child is important, because if there is some chance that there
+is a closer point on the other side of the plane, then you must check that branch of the k-d tree.
+
+**Note: that if you have found less than k neighbors, your maximum search distance
+is the entire space. That is, recur on both subtrees of the current node.
+
+If the previous if-statement is false and you do not need to recur down both children, then:
+If the current node's coordinate on the relevant axis is less than the target's coordinate on
+the relevant axis, recur on the right child.
+
+Else if the current node's coordinate on the relevant axis is greater than the target's
+coordinate on the relevant axis, recur on the left child.
+     */
+
+    private double calcDist(double height, double weight, double age, Users user) {
+        return Math.sqrt(Math.pow(height-user.getHeight(), 2) + Math.pow(weight-user.getWeight(), 2) + Math.pow(age-user.getAge(), 2));
+    }
+    public List<Users> kNearestNeighbors(List<Users> currentList, INode currentNode, double height, double weight, double age) {
+        Users currentUser = currentNode.getUser();
+        double currDist = calcDist(height, weight, age, currentUser);
+        for (Users nearUser: currentList) {
+
+        }
+        return currentList;
     }
 }
 

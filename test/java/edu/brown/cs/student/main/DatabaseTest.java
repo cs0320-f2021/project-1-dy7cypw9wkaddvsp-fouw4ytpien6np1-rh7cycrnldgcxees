@@ -8,12 +8,14 @@ public class DatabaseTest {
 
   @Test
   public void testChangePath() {
-
+    Database database = new Database();
+    database.changePath("data/project-1/justusersSMALL.sqlite3") // test if this does not error
   }
 
   @Test
   public void testInsert() {
-
+    Database database = new Database();
+    Users user1 = new Users();
   }
 
   @Test

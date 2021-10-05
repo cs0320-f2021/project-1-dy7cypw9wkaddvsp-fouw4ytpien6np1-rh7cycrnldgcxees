@@ -20,7 +20,6 @@ public class Database {
      */
     private static Connection conn = null;
 
-
     /**
      * Default constructor
      *
@@ -30,9 +29,9 @@ public class Database {
 
     /**
      * Method to set/reset connection with database to given filepath
-     * @param filename
-     * @throws ClassNotFoundException
-     * @throws SQLException
+     * @param filename - path to database
+     * @throws ClassNotFoundException - error if class is not found
+     * @throws SQLException - sql error for urlToDB
      */
     public void changePath(String filename) throws ClassNotFoundException, SQLException {
         conn = null;
@@ -46,6 +45,7 @@ public class Database {
         stat.executeUpdate("PRAGMA foreign_keys=ON;");
         stat.close();
     }
+
     /**
      * A method to insert generic object into Databas
      * @param object - Object to be inserted into Database

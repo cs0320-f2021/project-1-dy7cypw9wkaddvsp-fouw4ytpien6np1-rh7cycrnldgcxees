@@ -80,4 +80,24 @@ public class Users implements ITable {
   public String getHoroscope() {
     return horoscope;
   }
+
+  /**
+   *
+   * @param attr
+   * @return
+   */
+  public double getAttrByName(String attr) {
+    if (attr.equals("height")) {
+      return this.height;
+    }
+    else if (attr.equals("weight")) {
+      return this.weight;
+    }
+    else if (attr.equals("age")) {
+      return this.age;
+    }
+    else {
+      throw new RuntimeException("Invalid Attribute");
+    }
+  }
 }
