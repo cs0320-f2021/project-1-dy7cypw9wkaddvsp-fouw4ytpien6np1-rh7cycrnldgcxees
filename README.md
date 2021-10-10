@@ -77,5 +77,3 @@ within the list of k each of the 12 Horoscope signs correspond to. For example:
     Pisces: 0
 
 
-
-
