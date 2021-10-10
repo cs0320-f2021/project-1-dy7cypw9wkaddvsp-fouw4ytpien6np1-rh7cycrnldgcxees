@@ -1,6 +1,7 @@
-package edu.brown.cs.student.main;
+package edu.brown.cs.student.kdtree;
 
-import edu.brown.cs.student.main.table.Users;
+import edu.brown.cs.student.main.orm.Database;
+import edu.brown.cs.student.main.orm.table.Users;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -70,8 +71,20 @@ public class UsersKDTree implements IKDTree {
             int pivot = sortedList.size()/2;
             Users median = sortedList.get(pivot);
 
-            Node medianNode = new Node(
-                    median.getHeight(), median.getWeight(), median.getAge(),
+            // transform inputs to be able to compare
+            String unformattedWeight = median.getWeight();
+            double weight = Double.parseDouble(
+                unformattedWeight.substring(0, unformattedWeight.length() - 3));
+            String unformattedHeight = median.getHeight();
+            String[] splitHeight = unformattedHeight.split(" ");
+            Double feet =  Double.parseDouble(splitHeight[0].substring(0,
+                splitHeight.length - 1)) * 12;
+            Double inches = Double.parseDouble(splitHeight[1].substring(0,
+                splitHeight.length - 2));
+            double height = feet + inches;
+            double age =  Double.parseDouble(median.getAge());
+
+            Node medianNode = new Node(height, weight, age,
                     depthMap.get(depth % 3), depth, median, parent);
             INode left;
             INode right;
@@ -91,8 +104,21 @@ public class UsersKDTree implements IKDTree {
         else if (userList.size() == 1){
             Users current = userList.get(0);
 
+            // transform inputs to be able to compare
+            String unformattedWeight = current.getWeight();
+            double weight = Double.parseDouble(
+                unformattedWeight.substring(0, unformattedWeight.length() - 3));
+            String unformattedHeight = current.getHeight();
+            String[] splitHeight = unformattedHeight.split(" ");
+            Double feet =  Double.parseDouble(splitHeight[0].substring(0,
+                splitHeight.length - 1)) * 12;
+            Double inches = Double.parseDouble(splitHeight[1].substring(0,
+                splitHeight.length - 2));
+            double height = feet + inches;
+            double age =  Double.parseDouble(current.getAge());
+
             return new Leaf(
-                    current.getHeight(), current.getWeight(), current.getAge(),
+                    height, weight, age,
                     depthMap.get(depth % 3), depth, current, parent);
         }
         else {
@@ -136,10 +162,25 @@ Else if the current node's coordinate on the relevant axis is greater than the t
 coordinate on the relevant axis, recur on the left child.
      */
 
-    private double calcDist(double height, double weight, double age, Users user) {
-        return Math.sqrt(Math.pow(height-user.getHeight(), 2) + Math.pow(weight-user.getWeight(), 2) + Math.pow(age-user.getAge(), 2));
+    private double calcDist(double nodeHeight, double nodeWeight, double nodeAge, Users user) {
+        // transform inputs to be able to compare
+        String unformattedWeight = user.getWeight();
+        double weight = Double.parseDouble(
+            unformattedWeight.substring(0, unformattedWeight.length() - 3));
+        String unformattedHeight = user.getHeight();
+        String[] splitHeight = unformattedHeight.split(" ");
+        Double feet =  Double.parseDouble(splitHeight[0].substring(0,
+            splitHeight.length - 1)) * 12;
+        Double inches = Double.parseDouble(splitHeight[1].substring(0,
+            splitHeight.length - 2));
+        double height = feet + inches;
+        double age =  Double.parseDouble(user.getAge());
+
+        return Math.sqrt(Math.pow(nodeHeight - height, 2) + Math.pow(nodeWeight - weight, 2) +
+            Math.pow(nodeAge - age, 2));
     }
-    public List<Users> kNearestNeighbors(List<Users> currentList, INode currentNode, double height, double weight, double age) {
+    public List<Users> kNearestNeighbors(List<Users> currentList, INode currentNode,
+                                         double height, double weight, double age) {
         Users currentUser = currentNode.getUser();
         double currDist = calcDist(height, weight, age, currentUser);
         for (Users nearUser: currentList) {

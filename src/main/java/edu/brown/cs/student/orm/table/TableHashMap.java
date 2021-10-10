@@ -1,8 +1,4 @@
-package edu.brown.cs.student.main.table;
-
-import edu.brown.cs.student.main.handlers.ChangePathHandler;
-import edu.brown.cs.student.main.handlers.ICommandHandler;
-import edu.brown.cs.student.main.handlers.UsersHandler;
+package edu.brown.cs.student.orm.table;
 
 import java.sql.SQLException;
 import java.util.HashMap;

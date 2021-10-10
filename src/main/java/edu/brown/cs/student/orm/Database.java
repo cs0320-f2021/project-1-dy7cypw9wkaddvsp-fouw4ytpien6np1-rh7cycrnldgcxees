@@ -1,13 +1,9 @@
-package edu.brown.cs.student.main;
-import edu.brown.cs.student.main.handlers.ICommandHandler;
-import edu.brown.cs.student.main.table.ITable;
-import edu.brown.cs.student.main.table.TableHashMap;
-import edu.brown.cs.student.main.table.Users;
-import org.checkerframework.checker.units.qual.A;
-import org.eclipse.jetty.server.Authentication;
+package edu.brown.cs.student.orm;
+import edu.brown.cs.student.orm.table.ITable;
+import edu.brown.cs.student.orm.table.TableHashMap;
+import edu.brown.cs.student.orm.table.Users;
 
 import java.lang.reflect.*;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
@@ -56,19 +52,14 @@ public class Database {
         //String[] fieldNames = new String[](rawFields.length);
         //Object[] fieldContent = new Object[](rawFields.length);
         String tuple = "";
-        for (int i = 0; i<rawFields.length; i++) {
+        for (int i = 0; i < rawFields.length; i++) {
             rawFields[i].setAccessible(true);
 
-            //fieldNames[i] = rawFields[i].getName();  // name of field as string
-            //fieldContent[i] = rawFields[i].get();  // object (content) of field
-            Object currentContent = rawFields[i].get(object);
-
-
-            // THIS vvv SEEMS WRONG BUT WE CAN FIX IT LATER
-            if (rawFields[i].getGenericType().getTypeName().equals("int") || rawFields[i].getGenericType().getTypeName().equals("double")) {
+            String currentField = rawFields[i].getGenericType().getTypeName();
+            if (currentField.equals("int") || currentField.equals("double")) {
                 tuple += rawFields[i].get(object).toString();
             }
-            else if (rawFields[i].getGenericType().getTypeName().equals("String")) {
+            else if (currentField.equals("java.lang.String")) {
                 tuple += "'" + rawFields[i].get(object).toString() + "'";
             }
             else {
@@ -100,20 +91,16 @@ public class Database {
         String conditions = "";
         for (int i = 0; i < rawFields.length; i++) {
             rawFields[i].setAccessible(true);
-            //fieldNames[i] = rawFields[i].getName();
-            //fieldContent[i] = rawFields[i].get();  // object (content) of field
-
 
             Object currentContent = rawFields[i].get(object);
             String attrName = rawFields[i].getName();
 
-
+            String currentField = rawFields[i].getGenericType().getTypeName();
             conditions += attrName + "=";
-            // THIS vvv SEEMS WRONG BUT WE CAN FIX IT LATER
-            if (rawFields[i].getGenericType().getTypeName().equals("int") || rawFields[i].getGenericType().getTypeName().equals("double")) {
+            if (currentField.equals("int") || currentField.equals("double")) {
                 conditions += currentContent.toString();
             }
-            else if (rawFields[i].getGenericType().getTypeName().equals("String")) {
+            else if (currentField.equals("java.lang.String")) {
                 conditions += "'" + rawFields[i].get(object).toString() + "'";
             }
             else {
@@ -137,17 +124,16 @@ public class Database {
      * @return Collection of objects containing all objects in table which match query
      * @throws SQLException - if issue with Database connection
      */
-    public Collection<Object> where(String attributeName, String attributeContent,
-                                    String tableName, String selectedAttrs)
+    public Collection<? super Object> where(String attributeName, String attributeContent,
+                               String tableName)
         throws SQLException {
         TableHashMap map = new TableHashMap();
         HashMap<String, ITable> tableMap = map.getMap();
 
         ArrayList<Object> objects = new ArrayList<>();
-        String writtenStatement = "SELECT " + selectedAttrs + " FROM " + tableName + " WHERE " +
-            attributeName + "=" + attributeContent + ";";
+        String writtenStatement = "SELECT * FROM " + tableName + " WHERE " +
+            attributeName + "=" + "'" + attributeContent + "'" + ";";
         PreparedStatement prep = conn.prepareStatement(writtenStatement);
-        prep.executeUpdate();
         ResultSet rs = prep.executeQuery();
         while (rs.next()) {
             ITable table = tableMap.get(tableName);
@@ -164,7 +150,7 @@ public class Database {
      * @return Collection<Object> - A collection of objects
      * @throws SQLException - throws error if bad input (i.e. col name doesn't exist)
      */
-    public List<Object> selectAll(List<String> attributes, String tableName)
+    public Collection<Object> selectAll(List<String> attributes, String tableName)
             throws SQLException {
         // get hashmap of table name to Objects that implement ITable
         TableHashMap map = new TableHashMap();
@@ -183,7 +169,6 @@ public class Database {
         // put together SQL:
         String writtenStatement = "SELECT " + attributesString.toString() + " FROM " + tableName;
         PreparedStatement prep = conn.prepareStatement(writtenStatement); // prep statement
-        prep.executeUpdate();
         ResultSet rs = prep.executeQuery(); // returns a ResultSet of SQL query
         while (rs.next()) { // create a new object of each result
             ITable table = tableMap.get(tableName.toLowerCase());
@@ -206,7 +191,6 @@ public class Database {
         // put together SQL:
         String writtenStatement = "SELECT height, weight, age, horoscope FROM users";
         PreparedStatement prep = conn.prepareStatement(writtenStatement); // prep statement
-        prep.executeUpdate();
         ResultSet rs = prep.executeQuery(); // returns a ResultSet of SQL query
         while (rs.next()) { // create a new object of each result
             Users u = new Users();
@@ -224,12 +208,29 @@ public class Database {
      * @throws SQLException - if issue with connecting to database
      */
     public void update(Object object, String attributeName, String newAttributeContent)
-        throws SQLException {
+        throws SQLException, NoSuchFieldException, IllegalAccessException {
         String tableName = object.getClass().getSimpleName().toLowerCase();
         // need to set where condition to only update object in table with
         // all of the attrs in that object
+        String attrsMatch = "";
+
+
+        Field[] rawFields = object.getClass().getDeclaredFields();
+        for (int i = 0; i < rawFields.length; i++) {
+            rawFields[i].setAccessible(true);
+            Field field = rawFields[i];
+            Object value = field.get(object);
+
+            String[] correctArray = field.toString().split("\\.");
+
+
+            attrsMatch += correctArray[correctArray.length - 1] + "=" + "'" + value + "'";
+            if (i != rawFields.length - 1) {
+                attrsMatch += "AND ";
+            }
+        }
         String writtenStatement = "UPDATE " + tableName + " SET " + attributeName + "=" +
-            newAttributeContent + ";";
+            newAttributeContent + " WHERE " + attrsMatch + ";";
         PreparedStatement prep = conn.prepareStatement(writtenStatement);
         prep.executeUpdate();
         prep.close();
@@ -238,7 +239,6 @@ public class Database {
     // Help from TA: what should be the return type on this?
     public void rawQuery(String sqlStatement) throws SQLException {
         PreparedStatement prep = conn.prepareStatement(sqlStatement);
-        prep.executeUpdate();
         prep.close();
     }
 

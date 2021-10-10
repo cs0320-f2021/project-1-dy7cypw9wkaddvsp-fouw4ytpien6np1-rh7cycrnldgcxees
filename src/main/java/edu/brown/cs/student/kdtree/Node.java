@@ -1,6 +1,6 @@
-package edu.brown.cs.student.main;
+package edu.brown.cs.student.kdtree;
 
-import edu.brown.cs.student.main.table.Users;
+import edu.brown.cs.student.main.orm.table.Users;
 
 /**
  * Class for Nodes, which are nodes in the KDTree that have children.

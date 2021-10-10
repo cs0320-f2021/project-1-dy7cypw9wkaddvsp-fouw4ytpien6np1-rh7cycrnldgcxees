@@ -1,7 +1,5 @@
 package edu.brown.cs.student.main.handlers;
 
-import edu.brown.cs.student.main.Database;
-
 import java.sql.SQLException;
 
 /**

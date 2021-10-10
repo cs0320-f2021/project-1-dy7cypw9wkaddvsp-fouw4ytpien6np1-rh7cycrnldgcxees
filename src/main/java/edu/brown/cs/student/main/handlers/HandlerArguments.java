@@ -1,7 +1,7 @@
 package edu.brown.cs.student.main.handlers;
 
-import edu.brown.cs.student.main.Database;
-import edu.brown.cs.student.main.UsersKDTree;
+import edu.brown.cs.student.orm.Database;
+import edu.brown.cs.student.kdtree.UsersKDTree;
 
 /**
  * Class to hold references to KDTree and Database, as well as REPL arguments

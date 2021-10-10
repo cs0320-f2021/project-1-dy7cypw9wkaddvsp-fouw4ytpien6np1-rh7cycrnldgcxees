@@ -1,9 +1,7 @@
-package edu.brown.cs.student.main.table;
+package edu.brown.cs.student.orm.table;
 
-import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Interface to get objects from databases
