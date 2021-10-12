@@ -1,4 +1,6 @@
-package edu.brown.cs.student.main;
+package edu.brown.cs.student.kdtree;
+
+import edu.brown.cs.student.main.orm.Database;
 
 import java.sql.SQLException;
 

@@ -13,6 +13,8 @@ import com.google.common.collect.ImmutableMap;
 
 import edu.brown.cs.student.main.handlers.HandlerArguments;
 import edu.brown.cs.student.main.handlers.ICommandHandler;
+import edu.brown.cs.student.kdtree.UsersKDTree;
+import edu.brown.cs.student.orm.Database;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

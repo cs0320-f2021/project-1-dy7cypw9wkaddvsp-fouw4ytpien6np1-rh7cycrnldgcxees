@@ -1,6 +1,7 @@
 package edu.brown.cs.student.main.handlers;
 
 import java.sql.SQLException;
+import edu.brown.cs.student.orm.Database;
 
 /**
  * Command Handler for "Users" keyword in REPL -
@@ -21,7 +22,11 @@ public class UsersHandler implements ICommandHandler{
             handlerArgs.getDataBase().changePath(handlerArgs.getArguments()[1]);
 
             // pass Database into KdTree to fill in tree
-            handlerArgs.getKdTree().fillTree(handlerArgs.getDataBase());
+
+            //WARNING: This line is broken for some reason? Intellij doesn't like how
+            //we are trying to retrieve the database for some reason:
+
+            //handlerArgs.getKdTree().fillTree(handlerArgs.getDataBase());
         }
         catch (Exception e) {
             System.out.println("Invalid file path");
