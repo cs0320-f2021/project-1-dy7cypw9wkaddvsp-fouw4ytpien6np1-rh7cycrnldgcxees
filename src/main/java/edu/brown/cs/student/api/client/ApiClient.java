@@ -22,7 +22,6 @@ public class ApiClient {
     this.client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).
                                       connectTimeout(Duration.ofSeconds(60))
                                       .build();
-
   }
 
   public String makeRequest(HttpRequest req) throws Exception {

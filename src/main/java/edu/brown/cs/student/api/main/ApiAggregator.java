@@ -4,6 +4,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import edu.brown.cs.student.api.client.ApiClient;
 import edu.brown.cs.student.api.client.ClientRequestGenerator;
+import edu.brown.cs.student.main.Classmate;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -17,7 +18,7 @@ public class ApiAggregator {
      * @return - List of the appropriate objects
      * @throws Exception
      */
-    public List<Object> getData(String dataType) throws Exception {
+    public List<Classmate> getData(String dataType) throws Exception {
         Gson gson = new Gson();
         Type type = setType(dataType);
         String filename = "https://runwayapi.herokuapp.com/" + dataType + "-";
@@ -72,9 +73,16 @@ public class ApiAggregator {
         }
         */
 
+        //what do we check for as data type?
+        if(dataType.equals("integration")){
+            return new TypeToken<List<Classmate>>(){}.getType();
+        }else {
+            throw new Exception("The aggregator does not contain a content type called: " + dataType);
+        }
+
 
         // dummy return
-        return new TypeToken<List<Object>>(){}.getType();
+//        return new TypeToken<List<Object>>(){}.getType();
     }
 
 }
