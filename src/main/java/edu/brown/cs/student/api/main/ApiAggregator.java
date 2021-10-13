@@ -92,7 +92,7 @@ public class ApiAggregator {
         */
 
         //what do we check for as data type?
-        if(dataType.equals("integration")){
+        if(dataType.equals("classmate")){
             return new TypeToken<List<Classmate>>(){}.getType();
         }else {
             throw new Exception("The aggregator does not contain a content type called: " + dataType);

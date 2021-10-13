@@ -2,6 +2,9 @@ package edu.brown.cs.student.main;
 
 import edu.brown.cs.student.api.client.ApiClient;
 import edu.brown.cs.student.api.main.ApiAggregator;
+import edu.brown.cs.student.kdtree.coordinates.Coordinate;
+import edu.brown.cs.student.kdtree.coordinates.KdTree;
+import edu.brown.cs.student.kdtree.searchAlgorithms.KdTreeSearch;
 import edu.brown.cs.student.orm.Database;
 
 import java.sql.ResultSet;
@@ -12,17 +15,25 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PartnerRecommender {
-    HashMap<Integer, Classmate> classmatesMap = new ClassmatesHashMap().getMap();
-    private ApiAggregator api;
+    private final HashMap<Integer, Classmate> classmatesMap = new ClassmatesHashMap().getMap();
+
+    //make list of classmates for kd tree loading:
+    private final List<Coordinate<Integer>> classmatesList = new ArrayList<>();
+
+    private final ApiAggregator api = new ApiAggregator();
     private final Database db = new Database();
+    private KdTree<Integer> kdTree;
 
     public PartnerRecommender() throws SQLException, ClassNotFoundException {}
 
-    public void setData () throws Exception {
+    public int setData () throws Exception {
+        // counts total number of classmates:
+        int numClassmates = 0;
+
         // call get getData on API to return list of classmates,
         // put each classmate from list into hashmap
         // have separate method to load in sql data for each classmate in hashmap
-        List<Classmate> classmates = api.getAPIData("Classmate");
+        List<Classmate> classmates = api.getAPIData("classmate");
 
         // change path to integration.sqlite3:
         this.db.changePath("data/integration/integration.sqlite3");
@@ -51,7 +62,6 @@ public class PartnerRecommender {
         // columns of aggregate are id (integer), positive (string), negative (string), interests (string),
         // name (String), commenting (integer), testing (integer), OOP (integer),
         // algorithms (integer), teamwork (integer), frontend (integer)
-
         // match classmate to the corresponding SQL entry in aggregate by id:
         for (Classmate classmate : classmates) {
             ResultSet rs = db.returnRSFromQuery("id",
@@ -59,8 +69,25 @@ public class PartnerRecommender {
             classmate.setSQLData(rs);
             // for each classmate, add them to a HM of IDs -> Classmate
             classmatesMap.put(classmate.getId(), classmate);
+
+            // add classmate to list of classmates which will go in the KdTree
+            classmatesList.add(classmate);
+
+            // increment classmates count by 1:
+            numClassmates++;
         }
-        // Write methods to load data from hashmap into kdtree and bloom filter(s) from
-        // classmatesMap
+
+        kdTree = new KdTree<>(7, classmatesList);
+
+        // get lists of unique tags for each categorical attribute
+        // arrange these into bitmaps for each classmate
+        return numClassmates;
     }
+
+    // Write methods to load data from hashmap into kdtree and bloom filter(s)
+    // PASS IN: info about target classmate in order to conduct search (student id)
+
+//    public List<Integer> getRecsFromStudentID(int numRecs, Integer studentID) {
+//        KdTreeSearch<Integer> searcher = new
+//    }
 }

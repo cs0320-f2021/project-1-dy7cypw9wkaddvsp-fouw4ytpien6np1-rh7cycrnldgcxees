@@ -37,6 +37,6 @@ public class ClientRequestGenerator {
     String reqUri = "https://runwayapi.herokuapp.com/integration";
     String apiKey = ClientAuth.getApiKey();
     return HttpRequest.newBuilder(URI.create(reqUri)).header("x-api-key", apiKey)
-        .POST(HttpRequest.BodyPublishers.ofString("{\"auth\": \"<cs-login>\"}")).build();
+        .POST(HttpRequest.BodyPublishers.ofString("{\"auth\": \"ihettman\"}")).build();
   }
 }

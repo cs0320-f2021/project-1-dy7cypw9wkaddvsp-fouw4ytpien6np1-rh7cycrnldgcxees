@@ -21,12 +21,7 @@ public class UsersHandler implements ICommandHandler{
             // assign filepath of Database to given filepath
             handlerArgs.getDataBase().changePath(handlerArgs.getArguments()[1]);
 
-            // pass Database into KdTree to fill in tree
 
-            //WARNING: This line is broken for some reason? Intellij doesn't like how
-            //we are trying to retrieve the database for some reason:
-
-            //handlerArgs.getKdTree().fillTree(handlerArgs.getDataBase());
         }
         catch (Exception e) {
             System.out.println("Invalid file path");

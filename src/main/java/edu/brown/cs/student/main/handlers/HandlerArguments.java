@@ -1,7 +1,8 @@
 package edu.brown.cs.student.main.handlers;
 
+import edu.brown.cs.student.kdtree.coordinates.KdTree;
+import edu.brown.cs.student.main.PartnerRecommender;
 import edu.brown.cs.student.orm.Database;
-import edu.brown.cs.student.kdtree.UsersKDTree;
 
 /**
  * Class to hold references to KDTree and Database, as well as REPL arguments
@@ -9,19 +10,22 @@ import edu.brown.cs.student.kdtree.UsersKDTree;
  */
 public class HandlerArguments {
 
-    private final UsersKDTree kdTree;
+    private final KdTree<Integer> kdTree;
     private final Database db;
+    private final PartnerRecommender recommender;
     private final String[] args;
 
     /**
      * Constructor
      * @param kd - KDTree from Main
      * @param db - Database from Main
+     * @param rec - PartnerRecommender from Main
      * @param args - String[] of REPL arguments from user
      */
-    public HandlerArguments(UsersKDTree kd, Database db, String[] args) {
+    public HandlerArguments(KdTree<Integer> kd, Database db, PartnerRecommender rec, String[] args) {
         this.kdTree = kd;
         this.db = db;
+        this.recommender = rec;
         this.args = args;
     }
 
@@ -29,7 +33,7 @@ public class HandlerArguments {
      * Gets KDTree
      * @return the KDTree reference
      */
-    public UsersKDTree getKdTree() {
+    public KdTree<Integer> getKdTree() {
         return kdTree;
     }
 
@@ -40,6 +44,13 @@ public class HandlerArguments {
     public Database getDataBase() {
         return db;
     }
+    /**
+     * Gets PartnerRecommender
+     * @return the PartnerRecommender reference
+     */
+    public PartnerRecommender getRecommender() {
+        return recommender;
+    }
 
     /**
      * Gets Arguments
@@ -48,4 +59,6 @@ public class HandlerArguments {
     public String[] getArguments() {
         return args;
     }
+
+
 }

@@ -2,6 +2,7 @@ package edu.brown.cs.student.main;
 
 import edu.brown.cs.student.main.handlers.ICommandHandler;
 import edu.brown.cs.student.main.handlers.ChangePathHandler;
+import edu.brown.cs.student.main.handlers.RecsysLoadHandler;
 import edu.brown.cs.student.main.handlers.UsersHandler;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public class CommandHashmap {
         map = new HashMap<String, ICommandHandler>();
         this.map.put("database", new ChangePathHandler());
         this.map.put("users", new UsersHandler());
+        this.map.put("recsys_load", new RecsysLoadHandler());
     }
 
     /**

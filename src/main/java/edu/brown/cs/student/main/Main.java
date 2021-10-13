@@ -11,9 +11,9 @@ import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 
+import edu.brown.cs.student.kdtree.coordinates.KdTree;
 import edu.brown.cs.student.main.handlers.HandlerArguments;
 import edu.brown.cs.student.main.handlers.ICommandHandler;
-import edu.brown.cs.student.kdtree.UsersKDTree;
 import edu.brown.cs.student.orm.Database;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
@@ -73,7 +73,8 @@ public final class Main {
     try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
       String input;
       Database db = new Database();
-      UsersKDTree kd = new UsersKDTree();
+      // kd tree would go here
+      PartnerRecommender rec = new PartnerRecommender();
 
       while ((input = br.readLine()) != null) {
         try {
@@ -83,7 +84,7 @@ public final class Main {
             str = str.trim();
           }
 
-          HandlerArguments handlerArgs = new HandlerArguments(kd, db, arguments);
+          HandlerArguments handlerArgs = new HandlerArguments(null, db, rec, arguments);
           keywordMap.get(arguments[0]).handle(handlerArgs);
         } catch (Exception e) {
           // e.printStackTrace();
