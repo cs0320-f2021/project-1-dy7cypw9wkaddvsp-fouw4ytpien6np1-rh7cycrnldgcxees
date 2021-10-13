@@ -31,6 +31,24 @@ public class ApiAggregator {
     }
 
     /**
+     *
+     * @param dataType - String representing the type of data being considered
+     * @return - List of the appropriate objects
+     * @throws Exception
+     */
+    public List<Classmate> getAPIData(String dataType) throws Exception {
+        Gson gson = new Gson();
+        Type type = setType(dataType);
+        String filename = "https://runwayapi.herokuapp.com/integration/" + dataType + "-";
+        String response1 = client.makeRequest(ClientRequestGenerator.getSecuredPostRequest());
+        String response2 = client.makeRequest(ClientRequestGenerator.getSecuredPostRequest());
+        response1 = generateExtras("one",filename, response1);
+        response2 = generateExtras("two",filename, response2);
+        String best_response = response1.length() > response2.length() ? response1 : response2;
+        return gson.fromJson(best_response,type);
+    }
+
+    /**
      * Creates request until the result is not an error message ( At most 5 times )
      * @param server - The number of the api that we want to call
      * @param filename - The name of the api we are referencing

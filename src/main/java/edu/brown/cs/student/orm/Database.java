@@ -144,6 +144,22 @@ public class Database {
     }
 
     /**
+     * Method is designed to take in a query and return a ResultSet for 1 object that
+     * matches the query (SELECT)
+     * @param attributeName - name of attr
+     * @param attributeContent - content to match
+     * @return ResultSet - a set of (usually) 1 ResultSet result
+     * @throws SQLException
+     */
+    public ResultSet returnRSFromQuery(String attributeName, String attributeContent,
+                                       String tableName) throws SQLException {
+        String writtenStatement = "SELECT * FROM " + tableName + " WHERE " +
+            attributeName + "=" + "'" + attributeContent + "'" + ";";
+        PreparedStatement prep = conn.prepareStatement(writtenStatement);
+        return prep.executeQuery();
+    }
+
+    /**
      * Method to select all rows of specific columns from a table
      * @param attributes - columns to return
      * @param tableName - table to extract form
@@ -239,6 +255,7 @@ public class Database {
     // Help from TA: what should be the return type on this?
     public void rawQuery(String sqlStatement) throws SQLException {
         PreparedStatement prep = conn.prepareStatement(sqlStatement);
+        prep.executeUpdate();
         prep.close();
     }
 

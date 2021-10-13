@@ -27,4 +27,16 @@ public class ClientRequestGenerator {
               .build();
     return request;
   }
+
+  /**
+   * POST request for integration data from API
+   *
+   * @return an HttpRequest object for accessing and posting to the secured resource.
+   */
+  public static HttpRequest getSecuredPostRequest() {
+    String reqUri = "https://runwayapi.herokuapp.com/integration";
+    String apiKey = ClientAuth.getApiKey();
+    return HttpRequest.newBuilder(URI.create(reqUri)).header("x-api-key", apiKey)
+        .POST(HttpRequest.BodyPublishers.ofString("{\"auth\": \"<cs-login>\"}")).build();
+  }
 }

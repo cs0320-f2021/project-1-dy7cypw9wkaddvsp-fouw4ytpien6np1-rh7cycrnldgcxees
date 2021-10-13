@@ -1,6 +1,6 @@
 package edu.brown.cs.student.kdtree;
 
-import edu.brown.cs.student.main.orm.Database;
+import edu.brown.cs.student.orm.Database;
 
 import java.sql.SQLException;
 
