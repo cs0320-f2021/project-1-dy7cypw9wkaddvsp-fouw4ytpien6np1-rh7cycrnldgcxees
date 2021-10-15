@@ -8,6 +8,7 @@ import edu.brown.cs.student.main.Classmate;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 public class ApiAggregator {
     private final ApiClient client = new ApiClient();
@@ -36,7 +37,7 @@ public class ApiAggregator {
      * @return - List of the appropriate objects
      * @throws Exception
      */
-    public List<Classmate> getAPIData(String dataType) throws Exception {
+    public List<Map<String,String>> getAPIData(String dataType) throws Exception {
         Gson gson = new Gson();
         Type type = setType(dataType);
         String filename = "https://runwayapi.herokuapp.com/integration/" + dataType + "-";
@@ -45,8 +46,10 @@ public class ApiAggregator {
         response1 = generateExtras("one",filename, response1);
         response2 = generateExtras("two",filename, response2);
         String best_response = response1.length() > response2.length() ? response1 : response2;
-        return gson.fromJson(best_response,type);
+        return gson.fromJson(best_response, List.class);
     }
+
+
 
     /**
      * Creates request until the result is not an error message ( At most 5 times )
