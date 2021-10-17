@@ -114,7 +114,8 @@ public class PartnerRecommender {
      */
     public List<String> getRecsFromStudentID(int numRecs, String studentID) {
 
-        if (!classmatesMap.containsKey(studentID)) {
+        if (!classmatesMap.containsKey(studentID) || numRecs > classmatesMap.size() ||
+        numRecs < 0) {
             throw new RuntimeException("Invalid StudentID");
         }
         Classmate target = classmatesMap.get(studentID);

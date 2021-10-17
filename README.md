@@ -92,23 +92,12 @@ Matchmaker Results: how minorities may be impacted
 
 Larger-reaching impacts
 
-    
-    
-
-As you work through the data, think about how it reflects biases within society even though it hasn’t been 
-manipulated nor collected with specific motivations in mind. As seen in a study by the National Bureau on Economic 
-Development (read this summary), even when providing information on themselves - the topic which an individual can 
-speak to best - different groups act differently, with minorities far less likely to rate their own abilities well 
-than their equally skilled peers in the majority. From this angle, how might your matchmaker’s results end up treating
-minorities differently than their more privileged counterparts? 
-
-    ...
-
-
-What larger-reaching impacts might this have (e.g. are biases reiterated? Do members of minority groups receive 
-as well-suited matches as their peers might? etc.):
-
-    ...
-    
-In the questions section of your README, write a paragraph describing these impacts and explaining how your system 
-design was influenced by this context.
+    If a biased system such as this were to be used in a larger context, or even in the current context, members
+    of minority groups would rarely be grouped up with others with similar traits or with complementing skills, etc.
+    Although we didn't have time to fully address these concerns, we believe that the data collection process may 
+    be helped with a disclaimer/educational resource that could be presented before a user responds to the survey.
+    There are coding-relating decision we can make to have our system be more unbiased, such as perhaps taking race 
+    into account and making sure we don't have clusters of people from similar backgrounds in the same group, but a
+    disclaimer up front could be a first step. We could summarize the findings from the study above on the cover page
+    before a user inputs their responses, as well as create added checks in our code to make sure people are grouped
+    up with who they should be grouped up with and that race or minority status does not skew those results.
