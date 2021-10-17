@@ -119,7 +119,7 @@ public class PartnerRecommender {
      * @param studentID - student ID of target student
      * @return - list of Strings representing student IDs in order of partner compatibility
      */
-    public List<RankingsHelper> getRecsFromStudentID(int numRecs, String studentID) {
+    public List<String> getRecsFromStudentID(int numRecs, String studentID) {
         Classmate target = classmatesMap.get(studentID);
         // run bloom filter on list of all students
         //================================================================================
@@ -167,16 +167,88 @@ public class PartnerRecommender {
 
         // sort ranks by the rank field in RankingsHelper
         ranks.sort(Comparator.comparing(RankingsHelper::getRank));
-        for (RankingsHelper rankHelper : ranks) {
-            System.out.println(rankHelper.toString());
+
+//        for (RankingsHelper rankHelper : ranks) {
+//            System.out.println(rankHelper.toString());
+//        }
+//
+//        // print out top k results by average rank
+//        System.out.println("Found top " + numRecs + " matches. Here are the IDs:");
+//        for (int i = 0; i < numRecs; i++) {
+//            RankingsHelper currRankObj = ranks.get(i);
+//            System.out.println(currRankObj.getId());
+//        }
+        List<String> rankedIDs = new ArrayList<>();
+        for (int i=0;i<numRecs;i++) {
+            rankedIDs.add(ranks.get(i).getId());
+        }
+        return rankedIDs;
+    }
+    // helper for generate groups
+    private List<String> createGroup(String nextID, int leftToFind, List<String> currGroup, List<String> unvisited, Map<String, List<String>> matchMap) {
+        // base case -> group is full
+        if (leftToFind == 0) {
+            return currGroup;
         }
 
-        // print out top k results by average rank
-        System.out.println("Found top " + numRecs + " matches. Here are the IDs:");
-        for (int i = 0; i < numRecs; i++) {
-            RankingsHelper currRankObj = ranks.get(i);
-            System.out.println(currRankObj.getId());
+        // loop through matches,
+        for (String potentialPartner : matchMap.get(nextID)) {
+            //check if potential partner has been matched up already
+            if (unvisited.contains(potentialPartner)) {
+                // remove from list of available classmates
+                unvisited.remove(potentialPartner);
+
+                //clone current group (because I'm afraid of recursion)
+                List<String> updatedGroup = new ArrayList<>();
+                updatedGroup.addAll(currGroup);
+                //add new partner
+                updatedGroup.add(potentialPartner);
+
+                //make recursive call to find and add rest of group
+                return createGroup(potentialPartner, leftToFind - 1, updatedGroup, unvisited, matchMap);
+            }
         }
-        return ranks;
+        //if somehow there is no one left to partner with because everyone has been visited already
+        throw new RuntimeException("Error creating group: all matches have been taken already");
+    }
+    public List<List<String>> generateGroups(int teamSize) {
+        Map<String,List<String>> classmateToBestMatches = new HashMap<>();
+        for (String classmateID: classmatesMap.keySet()) {
+            if (!classmatesMap.containsKey(classmateID)) {
+                classmateToBestMatches.put(classmateID, getRecsFromStudentID(classmatesMap.size()-1, classmateID));
+            }
+        }
+        // check unvisted instead
+
+        List<String> unvisited = new ArrayList<>(classmatesMap.keySet());
+
+        // figure out how to split up the groups
+
+        // do classmatesmap.size()/teamsize - total number of teams
+        // do classmatesmap.size() % teamsize - find the remainder
+        //------------------> find number of groups which need an extra partner
+        // pick random id from those whonhaven't been visited yet
+
+        // find number of teams
+        int numTeams = classmatesMap.size()/teamSize;
+        Random rand = new Random();
+
+        List<List<String>> listOfGroups= new ArrayList<>();
+
+        // create team for each numTeams and add to listOfGroups
+        for (int i = 0; i<numTeams; i++) {
+            String randomID = unvisited.get(rand.nextInt(unvisited.size()));
+            unvisited.remove(randomID);
+            listOfGroups.add(createGroup(randomID, teamSize-1, new ArrayList<>(), unvisited, classmateToBestMatches));
+        }
+
+        // add remaining students to their top choice group
+        for (int i=0;i<unvisited.size();i++) {
+            //TO_DO
+
+        }
+
+        return listOfGroups;
+
     }
 }
