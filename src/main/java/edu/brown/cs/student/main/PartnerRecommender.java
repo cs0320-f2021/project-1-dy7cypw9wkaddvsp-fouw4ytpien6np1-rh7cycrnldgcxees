@@ -176,6 +176,7 @@ public class PartnerRecommender {
     }
 
     /**
+<<<<<<< Updated upstream
      * Helper for Generate Groups
      *
      * @param nextID - next id to find
@@ -187,6 +188,17 @@ public class PartnerRecommender {
      */
     private List<String> createGroup(String nextID, int leftToFind, List<String> currGroup,
                                      List<String> unvisited, Map<String, List<String>> matchMap) {
+=======
+     * Helper method for generateGroups - takes in an ID and recursively finds the rest of a group for it
+     * @param nextID - ID to find rest of group for
+     * @param leftToFind - how many group members this group still needs to find
+     * @param currGroup - List of group members found for this ID so far
+     * @param unvisited - List of possible group members - classmates that haven't been assigned yet
+     * @param matchMap - hashmap of classmate ID to list of all other classmates in ranked order
+     * @return List of IDs corresponding to one group
+     */
+    private List<String> createGroup(String nextID, int leftToFind, List<String> currGroup, List<String> unvisited, Map<String, List<String>> matchMap) {
+>>>>>>> Stashed changes
         // base case -> group is full
         if (leftToFind == 0) {
             return currGroup;
@@ -200,8 +212,7 @@ public class PartnerRecommender {
                 unvisited.remove(potentialPartner);
 
                 //clone current group (because I'm afraid of recursion)
-                List<String> updatedGroup = new ArrayList<>();
-                updatedGroup.addAll(currGroup);
+                List<String> updatedGroup = new ArrayList<>(currGroup);
                 //add new partner
                 updatedGroup.add(potentialPartner);
 
@@ -215,11 +226,17 @@ public class PartnerRecommender {
     }
 
     /**
+<<<<<<< Updated upstream
      * Generates teams of the inputted size. If total classmates is not divisible by teamSize,
      * then add extra classmates to random group.
      *
      * @param teamSize - Int of desired team size
      * @return List<List<String>> representing the teams and the classmates ids for each team.
+=======
+     * Generates groups from list of Classmates to maximize compatibility
+     * @param teamSize - How many members should be on each team (extras will be added to existing teams)
+     * @return List of Groups, each in the form of a List of Classmate IDs which form a group
+>>>>>>> Stashed changes
      */
     public List<List<String>> generateGroups(int teamSize) {
         if (teamSize < 1 || teamSize > classmatesMap.size()) {
@@ -236,12 +253,7 @@ public class PartnerRecommender {
         // check unvisited instead
         List<String> unvisited = new ArrayList<>(classmatesMap.keySet());
 
-        // figure out how to split up the groups
-
-        // do classmatesmap.size()/teamsize - total number of teams
-        // do classmatesmap.size() % teamsize - find the remainder
-        //------------------> find number of groups which need an extra partner
-        // pick random id from those whonhaven't been visited yet
+        // split up the groups
 
         // find number of teams
         int numTeams = classmatesMap.size()/teamSize;
@@ -251,14 +263,24 @@ public class PartnerRecommender {
 
         // create team for each numTeams and add to listOfGroups
         for (int i = 0; i<numTeams; i++) {
+            int teamSizeUpdated = teamSize;
+            //check if group should have an extra person or not
+            if (i>=classmatesMap.size()%teamSize) {
+                teamSizeUpdated--;
+            }
             String randomID = unvisited.get(rand.nextInt(unvisited.size()));
             unvisited.remove(randomID);
+<<<<<<< Updated upstream
             listOfGroups.add(createGroup(randomID, teamSize-1, new ArrayList<>(),
                 unvisited, classmateToBestMatches));
         }
         // add remaining students to their top choice group
         for (int i=0;i<unvisited.size();i++) {
             //TO_DO
+=======
+            // call to helper to create group for randomly selected classmate
+            listOfGroups.add(createGroup(randomID, teamSizeUpdated, new ArrayList<>(List.of(randomID)), unvisited, classmateToBestMatches));
+>>>>>>> Stashed changes
         }
         return listOfGroups;
     }
