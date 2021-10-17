@@ -20,6 +20,7 @@ public class CommandHashmap {
         this.map.put("users", new UsersHandler());
         this.map.put("recsys_load", new RecsysLoadHandler());
         this.map.put("recsys_rec", new RecsysRecHandler());
+        this.map.put("recsys_gen_group", new RecsysGroupHandler());
     }
 
     /**

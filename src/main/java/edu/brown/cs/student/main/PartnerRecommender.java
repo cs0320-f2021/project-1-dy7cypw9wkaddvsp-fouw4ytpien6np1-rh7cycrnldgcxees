@@ -175,7 +175,16 @@ public class PartnerRecommender {
         return rankedIDs;
     }
 
-    // helper for generate groups
+    /**
+     * Helper for Generate Groups
+     *
+     * @param nextID - next id to find
+     * @param leftToFind - list of ids left to find
+     * @param currGroup - current group algorithm is on
+     * @param unvisited - remaining IDs to process
+     * @param matchMap - map of matches of compatibilities
+     * @return List<String> representing the group
+     */
     private List<String> createGroup(String nextID, int leftToFind, List<String> currGroup,
                                      List<String> unvisited, Map<String, List<String>> matchMap) {
         // base case -> group is full
@@ -205,8 +214,18 @@ public class PartnerRecommender {
         throw new RuntimeException("Error creating group: all matches have been taken already");
     }
 
-
+    /**
+     * Generates teams of the inputted size. If total classmates is not divisible by teamSize,
+     * then add extra classmates to random group.
+     *
+     * @param teamSize - Int of desired team size
+     * @return List<List<String>> representing the teams and the classmates ids for each team.
+     */
     public List<List<String>> generateGroups(int teamSize) {
+        if (teamSize < 1 || teamSize > classmatesMap.size()) {
+            throw new RuntimeException("Team Size is negative or greater than number of classmates");
+        }
+
         Map<String,List<String>> classmateToBestMatches = new HashMap<>();
         for (String classmateID: classmatesMap.keySet()) {
             if (!classmatesMap.containsKey(classmateID)) {
@@ -214,8 +233,7 @@ public class PartnerRecommender {
                     getRecsFromStudentID(classmatesMap.size()-1, classmateID));
             }
         }
-        // check unvisted instead
-
+        // check unvisited instead
         List<String> unvisited = new ArrayList<>(classmatesMap.keySet());
 
         // figure out how to split up the groups
@@ -238,14 +256,10 @@ public class PartnerRecommender {
             listOfGroups.add(createGroup(randomID, teamSize-1, new ArrayList<>(),
                 unvisited, classmateToBestMatches));
         }
-
         // add remaining students to their top choice group
         for (int i=0;i<unvisited.size();i++) {
             //TO_DO
-
         }
-
         return listOfGroups;
-
     }
 }
