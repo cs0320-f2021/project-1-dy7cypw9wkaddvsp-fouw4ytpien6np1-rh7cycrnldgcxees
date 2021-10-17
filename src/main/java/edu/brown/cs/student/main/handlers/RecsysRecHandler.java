@@ -22,6 +22,8 @@ public class RecsysRecHandler implements ICommandHandler{
             System.out.println("Recommended successfully");
         } catch (NullPointerException e) {
             System.out.println("Error, run recsys_load first.");
+        } catch (RuntimeException e) {
+            System.out.println("inputted StudentID does not exist.");
         }
     }
 }
