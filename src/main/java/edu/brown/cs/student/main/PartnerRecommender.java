@@ -9,6 +9,7 @@ import edu.brown.cs.student.kdtree.coordinates.Coordinate;
 import edu.brown.cs.student.kdtree.coordinates.KdTree;
 import edu.brown.cs.student.kdtree.searchAlgorithms.KdTreeSearch;
 import edu.brown.cs.student.orm.Database;
+import org.checkerframework.checker.units.qual.A;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -118,32 +119,64 @@ public class PartnerRecommender {
      * @param studentID - student ID of target student
      * @return - list of Strings representing student IDs in order of partner compatibility
      */
-    public List<String> getRecsFromStudentID(int numRecs, String studentID) {
+    public List<RankingsHelper> getRecsFromStudentID(int numRecs, String studentID) {
         Classmate target = classmatesMap.get(studentID);
         // run bloom filter on list of all students
         //================================================================================
         // TO-DO: fix this line vvv I just put random values in to see if everything else was working by the filter
         // but this filter recommends the same top partners for everyone so something is broken
-        BloomFilter<String> filter = new BloomFilter<>(0.1,180);
+        BloomFilter<String> filter = new BloomFilter<>(0.01,classmatesMap.size());
         //================================================================================
 
         AndSimilarityComparator comparator = new AndSimilarityComparator(filter);
-        BloomFilterRecommender<Classmate> bloomFilterRecommender = new BloomFilterRecommender<>(classmatesMap, 0.1);
+        BloomFilterRecommender<Classmate> bloomFilterRecommender = new BloomFilterRecommender<>(
+            classmatesMap, 0.1);
         bloomFilterRecommender.setBloomFilterComparator(comparator);
 
-        List<Classmate> bloomFilterRecs = bloomFilterRecommender.getTopKRecommendations(target, classmatesMap.size()-1);
-        System.out.println(bloomFilterRecs.toString());
+        List<Classmate> bloomFilterRecs = bloomFilterRecommender.getTopKRecommendations(
+            target, classmatesMap.size() - 1);
 
-        //run kd tree on students
+        // create a hashmap of IDs to Rank for the Bloom Filter output
+        HashMap<String, Integer> bloomResultsMap = new HashMap<>();
+        for (int i = 0; i < bloomFilterRecs.size(); i++) {
+            bloomResultsMap.put(bloomFilterRecs.get(i).getId(), i);
+        }
+
+        // run kd tree on students
         KdTreeSearch<String> search = new KdTreeSearch<>();
-        List<Coordinate<String>> kdFilterRecs = search.getNearestNeighborsResult(classmatesMap.size()-1, target, kdTree.getRoot(), true);
-        System.out.println(kdFilterRecs.toString());
+        List<Coordinate<String>> kdFilterRecs = search.getNearestNeighborsResult(
+            classmatesMap.size() - 1, target, kdTree.getRoot(), true);
 
-        // combine these two lists by finding the average of the ranking from each
-        // filter for each item and sorting by the average ranking
+        // create a hashmap of IDs to Rank for the KD Tree
+        HashMap<String, Integer> kdResultsMap = new HashMap<>();
+        for (int i = 0; i < kdFilterRecs.size(); i++) {
+            kdResultsMap.put(kdFilterRecs.get(i).getId(), i);
+        }
 
-        return new ArrayList<>();
+        // since we have IDs from 1 to 61, we can
+        ArrayList<RankingsHelper> ranks = new ArrayList<>();
+        for (int i = 1; i < 62; i++) {
+            if (i == Integer.parseInt(studentID)) {
+                continue;
+            }
+            int bloomRank = bloomResultsMap.get(Integer.toString(i));
+            int kdRank = kdResultsMap.get(Integer.toString(i));
+            double averageRank = (bloomRank + kdRank) / 2;
+            ranks.add(new RankingsHelper(Integer.toString(i), averageRank));
+        }
+
+        // sort ranks by the rank field in RankingsHelper
+        ranks.sort(Comparator.comparing(RankingsHelper::getRank));
+        for (RankingsHelper rankHelper : ranks) {
+            System.out.println(rankHelper.toString());
+        }
+
+        // print out top k results by average rank
+        System.out.println("Found top " + numRecs + " matches. Here are the IDs:");
+        for (int i = 0; i < numRecs; i++) {
+            RankingsHelper currRankObj = ranks.get(i);
+            System.out.println(currRankObj.getId());
+        }
+        return ranks;
     }
-
-    //use a treemap? instead of a hashmap? (should allow you to sort)
 }

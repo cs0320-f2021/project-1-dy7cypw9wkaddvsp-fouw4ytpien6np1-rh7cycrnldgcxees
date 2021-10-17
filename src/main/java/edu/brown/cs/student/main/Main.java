@@ -85,7 +85,11 @@ public final class Main {
           }
 
           HandlerArguments handlerArgs = new HandlerArguments(null, db, rec, arguments);
-          keywordMap.get(arguments[0]).handle(handlerArgs);
+          try {
+            keywordMap.get(arguments[0]).handle(handlerArgs);
+          } catch (NullPointerException e) {
+            System.out.println("Invalid Command");
+          }
         } catch (Exception e) {
           // e.printStackTrace();
           System.out.println("ERROR: We couldn't process your input\n"+e);

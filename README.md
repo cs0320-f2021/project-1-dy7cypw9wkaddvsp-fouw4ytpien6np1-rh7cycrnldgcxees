@@ -8,6 +8,78 @@ To run use:
 To start the server use:
 `./run --gui [--port=<port>]`
 
+#Adding or removing commands to the REPL:
+
+To add commands to the REPL, one can navigate to the path:
+
+    edu/brown/cs/student/main/handlers
+
+In this directory, one can add new commands in the form of a CommandHandler that
+implements ICommandHandler. The final step is to navigate to:
+    
+    edu/brown/cs/student/main
+
+where one needs to add a key-value pair to the CommandHashmap. The key corresponds to a 
+String that represents the command key for the appropriate command, and the value corresponds to the 
+ICommandHandler added to edu/brown/cs/student/main/handlers.
+
+#Loading Student Data:
+ 
+A user of the REPL can load student data by running:
+
+    recsys_load
+
+If the process is successful, the REPL will print the following informative statement:
+
+    Loaded Recommender with k students
+
+where k represents the total number of students in the database. Students' attributes are aggregated from 
+an API call to https://runwayapi.herokuapp.com/integration and from an ORM processing of integration.sqlite3.
+
+Qualitative attributes are stored and processed by a Bloom Filter, and quantitative attributes are 
+stored and processed by a KDTree.
+
+#Generating k recommendations for a particular student_id:
+
+After running recsys_load, a user of the REPL can then get recommendations for a 
+particular student_id by running:
+
+    recsys_rec <num_recs> <student_id>
+
+where <num_recs> corresponds to the number of recommendations you would like to 
+make for the student (in our database, the max value is 60, since there are 61 
+total students) and <student_id> is the student_id of the student you are 
+interested in making recommendations for.
+
+The output of this process will be of the form, where k represents <num_recs>:
+
+    <matched_student_id_1>
+    <matched_student_id_2>
+    ...
+    <matched_student_id_k
+
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #Loading in databases:
 
 To load in a Database of Objects (where the path to the database reflects the local path), use:
