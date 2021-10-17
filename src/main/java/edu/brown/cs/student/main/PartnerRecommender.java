@@ -67,6 +67,7 @@ public class PartnerRecommender {
         this.db.rawQuery("CREATE TABLE pos_and_neg_traits " +
             "AS SELECT pos_agg.id, positive, negative FROM pos_agg " +
             "JOIN neg_agg ON pos_agg.id=neg_agg.id;");
+
         this.db.rawQuery("CREATE TABLE int_agg AS SELECT id, group_concat(interest) " +
             "AS interests FROM interests GROUP BY id;");
         // join above table with interests:
@@ -81,6 +82,8 @@ public class PartnerRecommender {
         // columns of aggregate are id (integer), positive (string), negative (string), interests (string),
         // name (String), commenting (integer), testing (integer), OOP (integer),
         // algorithms (integer), teamwork (integer), frontend (integer)
+
+
          */
 
 
