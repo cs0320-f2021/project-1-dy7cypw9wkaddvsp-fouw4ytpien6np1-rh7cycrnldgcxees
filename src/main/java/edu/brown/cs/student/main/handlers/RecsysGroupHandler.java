@@ -3,6 +3,7 @@ package edu.brown.cs.student.main.handlers;
 import edu.brown.cs.student.main.PartnerRecommender;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Class representing a CommandHandler for the recsys_gen_group command
@@ -21,7 +22,10 @@ public class RecsysGroupHandler implements ICommandHandler {
     try {
       PartnerRecommender recommender = handlerArguments.getRecommender();
       int teamSize = Integer.parseInt(handlerArguments.getArguments()[1]);
-      recommender.generateGroups(teamSize);
+      List<List<String>> output = recommender.generateGroups(teamSize);
+      for (List<String> list : output) {
+        System.out.println(list.toString());
+      }
     } catch (RuntimeException e) {
       System.out.println("Invalid teamSize argument.");
     }

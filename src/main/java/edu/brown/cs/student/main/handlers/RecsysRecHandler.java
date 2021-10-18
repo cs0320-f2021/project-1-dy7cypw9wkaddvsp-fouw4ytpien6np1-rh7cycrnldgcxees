@@ -14,8 +14,8 @@ public class RecsysRecHandler implements ICommandHandler {
      * IDs for the inputted User.
      *
      * @param handlerArguments - arguments from REPL (3 - recsys_rec <num_recs> <student_id>)
-     * @throws NullPointerException - four things can go wrong: the user can try to use command before
-     * data is loaded, the user could input an ID that doesn't exist, the user could input
+     * @throws NullPointerException - four things can go wrong: the user can try to use command
+     * before data is loaded, the user could input an ID that doesn't exist, the user could input
      * a number of recommendations larger than the total number of users, or a user could enter
      * a negative value for the number of recommendations.
      */

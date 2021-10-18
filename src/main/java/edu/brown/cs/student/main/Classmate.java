@@ -2,7 +2,6 @@ package edu.brown.cs.student.main;
 
 import edu.brown.cs.student.bloom.recommender.Item;
 import edu.brown.cs.student.kdtree.coordinates.Coordinate;
-import org.checkerframework.checker.units.qual.A;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Classmate implements Coordinate<String>, Item {
+public class Classmate implements Coordinate<String>, Item, IStudent {
     //shared info:
     private final String id;
     private final String name;
@@ -53,7 +52,6 @@ public class Classmate implements Coordinate<String>, Item {
      * @param marginalized_groups - person's marg groups (List)
      * @param prefer_group - person prefs group or not (String)
      */
-
     public Classmate(String id, String name, String meeting, String grade,
                      String years_of_experience, String horoscope, String meeting_times,
                      String preferred_language, String marginalized_groups,

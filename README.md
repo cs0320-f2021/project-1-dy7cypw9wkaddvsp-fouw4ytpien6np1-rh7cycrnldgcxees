@@ -77,6 +77,64 @@ The resulting output of this command is in the following format:
     ...
     [group_n_student_1, group_n_student_2, … group_n_student_k]
 
+
+#Notes on Implementations:
+
+User Story 1: Generic REPL/Adding and Removing Commands
+
+    
+
+User Story 2: Load Recommender with k Students
+
+    The Set data method in the PartnerRecommender Class aggregates data from integration.sqlite3
+    and from an API call to the appropriate integration website. In order to aggregate the data to be used in the
+    recsys_rec <num_recs> <student_id> and recsys_gen_groups <team_size> commands, our implementation uses the
+    Classmate class whose main constructor takes in the appropriate data from the generic API implementation.
+    In setData, we have a separate process to take in a ResultSet from a query, i.e. matching the ID fields of the 
+    JSON objects of the API call with those objects from the integration.sqlite3 database. We accomplished this by 
+    creating an extendible method in our database class that could arbitrarily take in a table and match on a 
+    shared field in both the ORM and API data to get the fields of the objects' whose IDs match (this does assume
+    that objects are relatable somehow between SQL and the API). From here, our Classmate object and other Obejcts that
+    extend IStudent (main constructor relates to API and it must implement setSQLData). Here is a point where we wish
+    we had more time to implement this component more generically. We had to use the Classmate class in our 
+    PartnerRecommender class, which is not ideal, however, we did try to create a skeleton for how we would make the 
+    implementation with a class to store attributes more generically. This is a primary focus for us on our next 
+    project. Moreover, when aggregating the SQL tables we had to run a portion of the code to make those new tables
+    only once (and subsequently comment it out) given that those changes we made to the SQL database would remain
+    after the program would finish running. We tried to troubleshoot this, but could not find an elegant solution.
+    From there, setData would load users into the KDTree and BloomFilter so that we could make recommendations.
+    The REPL command to load the data was recsys_load, which used the RecsysLoadHandler to actually load the data
+    and catch any erros. 
+
+User Story 3: get k recommendations for a particular student's ID. 
+
+    This was mainly handled by the getRecsFromStudentID method within PartnerRecommender.java. We also had a 
+    RecsysRecHandler to handle the REPL inputs associated with this command and to catch any erros like invalid
+    k number of recommendations or a studentID that did not exist. For the particular StudentID 
+    inputted, we took the recommendations from the BloomFilter and KD for all other 60 students. 
+    We then used a helper class to aggregate those two rankings for one overall ranking. We then sorted by the average
+    ranking and in the RecsysRecHandler we then printed out the top k results. Again to run this, one can type:
+    recsys_rec <num_recs> <student_id>.
+    
+
+User Story 4: get groups of size groupSize
+
+
+#Distribution of Woke:
+
+Izzy:
+
+Emma:
+
+Henry:
+
+    I spent most of my time on user stories 2 and 3 as well as helping others with miscellaneous things as they 
+    came up. Most of my work involved extending our database class to handle the aggregation of the 
+    data from SQL and the API call, so that we could create one aggregate Object, titled Classmate, which
+    would then be used in PartnerRecommender to actually make recommendations. I also wrote a large portion
+    of the README file and our thoughts below on how the Biases of our recommender system may negatively    
+    impact minorities.
+
 #Questions
 
 Matchmaker Results: how minorities may be impacted

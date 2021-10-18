@@ -107,7 +107,8 @@ public class PartnerRecommender {
     }
 
     /**
-     * Given a target student, returns List of student IDs in preference order based on partner compatibility
+     * Given a target student, returns List of student IDs in preference order based on partner
+     * compatibility
      * @param numRecs - number of students to return
      * @param studentID - student ID of target student
      * @return - list of Strings representing student IDs in order of partner compatibility
@@ -161,7 +162,7 @@ public class PartnerRecommender {
             }
             int bloomRank = bloomResultsMap.get(Integer.toString(i));
             int kdRank = kdResultsMap.get(Integer.toString(i));
-            double averageRank = (bloomRank + kdRank) / 2;
+            double averageRank = (bloomRank + kdRank) / 2.0;
             ranks.add(new RankingsHelper(Integer.toString(i), averageRank));
         }
 
@@ -223,14 +224,15 @@ public class PartnerRecommender {
      */
     public List<List<String>> generateGroups(int teamSize) {
         if (teamSize < 1 || teamSize > classmatesMap.size()) {
-            throw new RuntimeException("Team Size is negative or greater than number of classmates");
+            throw new RuntimeException("Team Size is negative or greater than number of " +
+                "classmates");
         }
 
         Map<String,List<String>> classmateToBestMatches = new HashMap<>();
         for (String classmateID: classmatesMap.keySet()) {
             if (!classmatesMap.containsKey(classmateID)) {
                 classmateToBestMatches.put(classmateID,
-                    getRecsFromStudentID(classmatesMap.size()-1, classmateID));
+                    getRecsFromStudentID(classmatesMap.size() - 1, classmateID));
             }
         }
         // check unvisited instead
@@ -238,27 +240,27 @@ public class PartnerRecommender {
 
         // figure out how to split up the groups
 
-        // do classmatesmap.size()/teamsize - total number of teams
-        // do classmatesmap.size() % teamsize - find the remainder
+        // do classmatesMap.size() / teamSize - total number of teams
+        // do classmatesMap.size() % teamSize - find the remainder
         //------------------> find number of groups which need an extra partner
-        // pick random id from those whonhaven't been visited yet
+        // pick random id from those who haven't been visited yet
 
         // find number of teams
-        int numTeams = classmatesMap.size()/teamSize;
+        int numTeams = classmatesMap.size() / teamSize;
         Random rand = new Random();
 
-        List<List<String>> listOfGroups= new ArrayList<>();
+        List<List<String>> listOfGroups = new ArrayList<>();
 
         // create team for each numTeams and add to listOfGroups
-        for (int i = 0; i<numTeams; i++) {
+        for (int i = 0; i < numTeams; i++) {
             String randomID = unvisited.get(rand.nextInt(unvisited.size()));
             unvisited.remove(randomID);
-            listOfGroups.add(createGroup(randomID, teamSize-1, new ArrayList<>(),
+            listOfGroups.add(createGroup(randomID, teamSize - 1, new ArrayList<>(),
                 unvisited, classmateToBestMatches));
         }
         // add remaining students to their top choice group
-        for (int i=0;i<unvisited.size();i++) {
-            //TO_DO
+        for (String leftOverID : unvisited) {
+
         }
         return listOfGroups;
     }
