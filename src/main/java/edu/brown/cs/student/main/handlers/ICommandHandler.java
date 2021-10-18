@@ -7,4 +7,5 @@ import java.sql.SQLException;
  */
 public interface ICommandHandler {
     void handle(HandlerArguments handlerArguments) throws SQLException, ClassNotFoundException, Exception;
+    String keyWord();
 }

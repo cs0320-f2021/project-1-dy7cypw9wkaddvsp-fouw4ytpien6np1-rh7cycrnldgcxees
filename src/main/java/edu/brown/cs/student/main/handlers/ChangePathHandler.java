@@ -7,7 +7,7 @@ import java.sql.SQLException;
  * To pass database filepath into Database and create connection
  */
 public class ChangePathHandler implements ICommandHandler {
-
+    public static final String keyWord = "database";
     /**
      * Handles "database" keyword in REPL
      * @param handlerArgs - Includes reference to database, kd tree, and user arguments
@@ -23,4 +23,8 @@ public class ChangePathHandler implements ICommandHandler {
             System.out.println("Invalid file path");
         }
     }
+
+    @Override
+    public String keyWord() {return keyWord;}
+
 }

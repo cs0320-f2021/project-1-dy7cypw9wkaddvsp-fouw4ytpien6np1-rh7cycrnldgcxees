@@ -2,7 +2,8 @@ package edu.brown.cs.student.main;
 
 import edu.brown.cs.student.bloom.recommender.Item;
 import edu.brown.cs.student.kdtree.coordinates.Coordinate;
-import org.checkerframework.checker.units.qual.A;
+import edu.brown.cs.student.kdtree.coordinates.Coordinate;
+import edu.brown.cs.student.orm.table.ITable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,12 +54,10 @@ public class Classmate implements Coordinate<String>, Item {
      * @param marginalized_groups - person's marg groups (List)
      * @param prefer_group - person prefs group or not (String)
      */
-
     public Classmate(String id, String name, String meeting, String grade,
                      String years_of_experience, String horoscope, String meeting_times,
                      String preferred_language, String marginalized_groups,
                      String prefer_group) {
-
         this.id = id;
         System.out.println("ITS HERE======================================"+this.id);
         this.name = name;
@@ -69,25 +68,19 @@ public class Classmate implements Coordinate<String>, Item {
 
         System.out.println(meeting_times);
         // convert meeting_times into list:
-        String[] meeting_times_split = meeting_times.split(";");
-        ArrayList<String> meetingTimesList = new ArrayList<>();
-        for (String item: meeting_times_split) {
-            meetingTimesList.add(item.trim());
+        this.meeting_times = new ArrayList<>();
+        for (String item: meeting_times.split(";")) {
+            this.meeting_times.add(item.trim());
         }
-
-        this.meeting_times = meetingTimesList;
         this.preferred_language = preferred_language;
         this.prefer_group = prefer_group;
 
         System.out.println(marginalized_groups);
         // convert marginalized_groups into list:
-        String[] marginalized_groups_split = marginalized_groups.split(";");
-        ArrayList<String> marginalizedGroupList = new ArrayList<>();
-        for (String item: marginalized_groups_split) {
-            marginalizedGroupList.add(item.trim());
+        this.marginalized_groups = new ArrayList<>();
+        for (String item: marginalized_groups.split(";")) {
+            this.marginalized_groups.add(item.trim());
         }
-        this.marginalized_groups = marginalizedGroupList;
-
         this.coordinates = new ArrayList<>();
         coordinates.add(this.years_of_experience);
     }
@@ -95,68 +88,47 @@ public class Classmate implements Coordinate<String>, Item {
 
 
     public Classmate(Map<String,String> map) {
-            this.id = map.get("id");
+        this.id = map.get("id");
+        this.name = map.get("name");
+        this.meeting = map.get("meeting");
+        this.grade = map.get("grade");
+        this.years_of_experience = Double.parseDouble(map.get("years_of_experience"));
+        this.horoscope = map.get("horoscope");
 
-            this.name = map.get("name");
-            this.meeting = map.get("meeting");
-            this.grade = map.get("grade");
-            this.years_of_experience = Double.parseDouble(map.get("years_of_experience"));
-            this.horoscope = map.get("horoscope");
+        // convert meeting_times into list:
+        this.meeting_times = new ArrayList<>();
+        for (String item: map.get("meeting_times").split(";")) {
+            this.meeting_times.add(item.trim());
+        }
+        this.preferred_language = map.get("preferred_language");
+        this.prefer_group = map.get("prefer_group");
 
-            // convert meeting_times into list:
-            String[] meeting_times_split = map.get("meeting_times").split(";");
-            ArrayList<String> meetingTimesList = new ArrayList<>();
-            for (String item: meeting_times_split) {
-                meetingTimesList.add(item.trim());
-            }
-
-            this.meeting_times = meetingTimesList;
-            this.preferred_language = map.get("preferred_language");
-            this.prefer_group = map.get("prefer_group");
-
-            // convert marginalized_groups into list:
-            String[] marginalized_groups_split = map.get("marginalized_groups").split(";");
-            ArrayList<String> marginalizedGroupList = new ArrayList<>();
-            for (String item: marginalized_groups_split) {
-                marginalizedGroupList.add(item.trim());
-            }
-            this.marginalized_groups = marginalizedGroupList;
-
-            this.coordinates = new ArrayList<>();
-            coordinates.add(this.years_of_experience);
-
+        // convert marginalized_groups into list:
+        this.marginalized_groups = new ArrayList<>();
+        for (String item: map.get("marginalized_groups").split(";")) {
+            this.marginalized_groups.add(item.trim());
+        }
+        this.coordinates = new ArrayList<>();
+        coordinates.add(this.years_of_experience);
     }
 
-    /**
-     * Sets fields from SQL ResultSet
-     *
-     * @param rs - set containing data read in from SQL
-     */
-    public void setSQLData(ResultSet rs) throws SQLException {
+
+    public Classmate getSQLData(ResultSet rs) throws SQLException {
         // convert interests into a list:
-        String interests = rs.getString("interests");
-        String[] interests_split = interests.split(",");
-        ArrayList<String> interestsList = new ArrayList<>();
-        for (String item: interests_split) {
-            interestsList.add(item.trim());
-        }
-        this.interests = interestsList;
+        this.interests = new ArrayList<>();
+        for (String item: rs.getString("interests").split(","))
+            this.interests.add(item.trim());
+
         // convert negative to a list:
-        String negatives = rs.getString("negative");
-        String[] negative_split = negatives.split(",");
-        ArrayList<String> negativesList = new ArrayList<>();
-        for (String item: negative_split) {
-            negativesList.add(item.trim());
+        this.negTraits = new ArrayList<>();
+        for (String item:  rs.getString("negative").split(","))
+            this.negTraits.add(item.trim());
+
+        // convert positive to a list:
+        this.posTraits = new ArrayList<>();
+        for (String item: rs.getString("positive").split(",")) {
+            this.posTraits.add(item.trim());
         }
-        this.negTraits = negativesList;
-        // convert negative to a list:
-        String positives = rs.getString("positive");
-        String[] pos_split = positives.split(",");
-        ArrayList<String> posList = new ArrayList<>();
-        for (String item: pos_split) {
-            posList.add(item.trim());
-        }
-        this.posTraits = posList;
 
         // set remaining fields
         this.commenting = rs.getDouble("commenting");
@@ -166,13 +138,15 @@ public class Classmate implements Coordinate<String>, Item {
         this.teamwork = rs.getDouble("teamwork");
         this.frontend = rs.getDouble("frontend");
 
-        // add numeric data to list of coords
+        // add numeric data to list of Doubles in the coordinates field
         this.coordinates.add(this.commenting);
         this.coordinates.add(this.testing);
         this.coordinates.add(this.oop);
         this.coordinates.add(this.algorithms);
         this.coordinates.add(this.teamwork);
         this.coordinates.add(this.frontend);
+
+        return this;
     }
 
     public List<String> getInterests() {
@@ -221,15 +195,12 @@ public class Classmate implements Coordinate<String>, Item {
         vector.add(preferred_language);
         vector.addAll(meeting_times);
         vector.addAll(marginalized_groups);
-        for (String i: interests) {
+        for (String i: interests)
             vector.add("interest:"+i);
-        }
-        for (String i: posTraits) {
+        for (String i: posTraits)
             vector.add("pos:"+i);
-        }
-        for (String i: negTraits) {
+        for (String i: negTraits)
             vector.add("neg:"+i);
-        }
         return vector;
     }
 
@@ -245,10 +216,12 @@ public class Classmate implements Coordinate<String>, Item {
         return meeting;
     }
 
+
     @Override
     public Double getCoordinateVal(int dim) {
         return coordinates.get(dim);
     }
+
     @Override
     public List<Double> getCoordinates() {
         return this.coordinates;
@@ -256,6 +229,6 @@ public class Classmate implements Coordinate<String>, Item {
 
     @Override
     public String toString() {
-        return "["+this.getId() + "]:" + this.getName();
+        return "["+this.getId()+"]:" + this.getName();
     }
 }

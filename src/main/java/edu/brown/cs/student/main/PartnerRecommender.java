@@ -15,23 +15,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * A Class which aggregates data about classmates from the API and SQL database
+ * to produce recommendations on the compatibility of classmates
+ */
 public class PartnerRecommender {
     private HashMap<String, Classmate> classmatesMap = new HashMap<>();
-
-    //make list of classmates for kd tree loading:
-    private List<Coordinate<String>> classmatesList = new ArrayList<>();
-
-    private ApiAggregator api = new ApiAggregator();
-    private Database db = new Database();
     private KdTree<String> kdTree;
 
-    public PartnerRecommender() throws SQLException, ClassNotFoundException {}
+    /**
+     * Default constructor
+     */
+    public PartnerRecommender() {}
 
+    /**
+     * A method which aggregates data from the API and the SQL Database to
+     * produce a single combined stream of data in the form of a collection
+     * of Classmates
+     * @return the number of Classmates read from the two sources
+     * @throws Exception - if there are issues with API aggregator or SQL data retrieval
+     */
     public int setData () throws Exception {
         classmatesMap = new HashMap<>();
-        classmatesList = new ArrayList<>();
-        api = new ApiAggregator();
-        db = new Database();
+        //make list of classmates for kd tree loading:
+        List<Coordinate<String>> classmatesList = new ArrayList<>();
+        ApiAggregator api = new ApiAggregator();
+        Database db = new Database();
 
         // counts total number of classmates:
         int numClassmates = 0;
@@ -53,7 +62,7 @@ public class PartnerRecommender {
         }
 
         // change path to integration.sqlite3:
-        this.db.changePath("data/integration/integration.sqlite3");
+        db.changePath("data/integration/integration.sqlite3");
         // run this raw query once to join all 4 tables together:
 
         // this part is commented out because the tables are already created.
@@ -92,7 +101,7 @@ public class PartnerRecommender {
         for (Classmate classmate : classmateObjects) {
             ResultSet rs = db.returnRSFromQuery("id",
                 String.valueOf(classmate.getId()), "aggregate");
-            classmate.setSQLData(rs);
+            classmate.getSQLData(rs);
             // for each classmate, add them to a HM of IDs -> Classmate
             classmatesMap.put(classmate.getId(), classmate);
 
@@ -120,10 +129,17 @@ public class PartnerRecommender {
      * @return - list of Strings representing student IDs in order of partner compatibility
      */
     public List<String> getRecsFromStudentID(int numRecs, String studentID) {
+        if (numRecs < 1) {
+            throw new IllegalArgumentException("Number of recommendations must be a positive number");
+        }
+        if (!classmatesMap.containsKey(studentID)) {
+            throw new IllegalArgumentException("Invalid student ID");
+        }
+
         Classmate target = classmatesMap.get(studentID);
         // run bloom filter on list of all students
         //================================================================================
-        // TO-DO: fix this line vvv I just put random values in to see if everything else was working by the filter
+        // TO-DO: fix this line vvv I just put random values in to see if everything else was working
         // but this filter recommends the same top partners for everyone so something is broken
         BloomFilter<String> filter = new BloomFilter<>(0.01,classmatesMap.size());
         //================================================================================
@@ -161,23 +177,14 @@ public class PartnerRecommender {
             }
             int bloomRank = bloomResultsMap.get(Integer.toString(i));
             int kdRank = kdResultsMap.get(Integer.toString(i));
-            double averageRank = (bloomRank + kdRank) / 2;
+            double averageRank = (bloomRank + kdRank) / 2.0;
             ranks.add(new RankingsHelper(Integer.toString(i), averageRank));
         }
 
         // sort ranks by the rank field in RankingsHelper
         ranks.sort(Comparator.comparing(RankingsHelper::getRank));
 
-//        for (RankingsHelper rankHelper : ranks) {
-//            System.out.println(rankHelper.toString());
-//        }
-//
-//        // print out top k results by average rank
-//        System.out.println("Found top " + numRecs + " matches. Here are the IDs:");
-//        for (int i = 0; i < numRecs; i++) {
-//            RankingsHelper currRankObj = ranks.get(i);
-//            System.out.println(currRankObj.getId());
-//        }
+        // get top k recommended partners
         List<String> rankedIDs = new ArrayList<>();
         for (int i=0;i<numRecs;i++) {
             rankedIDs.add(ranks.get(i).getId());
@@ -226,6 +233,13 @@ public class PartnerRecommender {
      * @return List of Groups, each in the form of a List of Classmate IDs which form a group
      */
     public List<List<String>> generateGroups(int teamSize) {
+        if (teamSize<1) {
+            throw new IllegalArgumentException("Team Size must be a positive number");
+        }
+        if (teamSize>classmatesMap.size()) {
+            throw new IllegalArgumentException("Not enough classmates to accommodate group of this size");
+        }
+
         Map<String,List<String>> classmateToBestMatches = new HashMap<>();
         for (String classmateID: classmatesMap.keySet()) {
             if (!classmatesMap.containsKey(classmateID)) {

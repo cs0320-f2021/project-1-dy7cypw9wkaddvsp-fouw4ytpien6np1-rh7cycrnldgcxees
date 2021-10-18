@@ -10,7 +10,7 @@ import edu.brown.cs.student.orm.Database;
  */
 public class HandlerArguments {
 
-    private final KdTree<Integer> kdTree;
+    private final KdTree<?> kdTree;
     private final Database db;
     private final PartnerRecommender recommender;
     private final String[] args;
@@ -22,18 +22,19 @@ public class HandlerArguments {
      * @param rec - PartnerRecommender from Main
      * @param args - String[] of REPL arguments from user
      */
-    public HandlerArguments(KdTree<Integer> kd, Database db, PartnerRecommender rec, String[] args) {
+    public HandlerArguments(KdTree<?> kd, Database db, PartnerRecommender rec, String[] args) {
         this.kdTree = kd;
         this.db = db;
         this.recommender = rec;
         this.args = args;
     }
 
+
     /**
      * Gets KDTree
      * @return the KDTree reference
      */
-    public KdTree<Integer> getKdTree() {
+    public KdTree<?> getKdTree() {
         return kdTree;
     }
 

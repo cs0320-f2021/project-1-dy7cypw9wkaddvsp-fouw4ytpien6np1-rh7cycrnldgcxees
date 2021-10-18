@@ -5,29 +5,33 @@ import edu.brown.cs.student.main.handlers.*;
 import java.util.HashMap;
 
 /**
- * Class to store the Hashmap of valid keywords for REPL
+ * Stores valid keywords for REPL in a hashmap mapping keywords to a Command Handlers
  * Goes from string representing keyword to specific Command Handler for keyword
  */
 public class CommandHashmap {
-    private final HashMap<String, ICommandHandler> map;
-
+    private static HashMap<String, ICommandHandler> map = new HashMap<>();
     /**
-     * Constructor
+     * No-arg constructor
      */
-    public CommandHashmap() {
-        map = new HashMap<String, ICommandHandler>();
-        this.map.put("database", new ChangePathHandler());
-        this.map.put("users", new UsersHandler());
-        this.map.put("recsys_load", new RecsysLoadHandler());
-        this.map.put("recsys_rec", new RecsysRecHandler());
-        this.map.put("recsys_gen_group", new RecsysGroupHandler());
+    public CommandHashmap(){}
+
+    public CommandHashmap(ICommandHandler[] handlers){
+        for (ICommandHandler ch: handlers){map.put(ch.keyWord(), ch);}
+    }
+
+    public ICommandHandler getHandler(String keyword){
+        return this.getMap().get(keyword);
+    }
+
+    // allows users to make their own handlers,
+    public void addHandler(String handlerFor, ICommandHandler commandHandler) {
+        if (!map.containsKey(handlerFor)) map.put(handlerFor, commandHandler);
+        // else if (!map.get(handlerFor).equals(commandHandler)) <--- todo: error
     }
 
     /**
      * Gets Hashmap
      * @return Hashmap of keywords to command handlers
      */
-    public HashMap<String, ICommandHandler> getMap() {
-        return map;
-    }
+    public HashMap<String, ICommandHandler> getMap() {return map;}
 }

@@ -3,11 +3,13 @@ package edu.brown.cs.student.main.handlers;
 import edu.brown.cs.student.main.PartnerRecommender;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Class representing a CommandHandler for the recsys_gen_group command
  */
 public class RecsysGroupHandler implements ICommandHandler {
+  public static final String keyWord = "recsys_gen_groups";
   /**
    * Handle method for recsys_gen_group command
    *
@@ -17,13 +19,25 @@ public class RecsysGroupHandler implements ICommandHandler {
    */
   @Override
   public void handle(HandlerArguments handlerArguments)
-      throws RuntimeException {
+      throws IllegalArgumentException {
     try {
       PartnerRecommender recommender = handlerArguments.getRecommender();
       int teamSize = Integer.parseInt(handlerArguments.getArguments()[1]);
-      recommender.generateGroups(teamSize);
-    } catch (RuntimeException e) {
-      System.out.println("Invalid teamSize argument.");
+      List<List<String>> groups = recommender.generateGroups(teamSize);
+      int i = 1;
+      for (List<String> group: groups) {
+        System.out.println("Group " + i + ": "+ group.toString());
+        i++;
+      }
+
+
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
     }
+  }
+
+  @Override
+  public String keyWord() {
+    return keyWord;
   }
 }
